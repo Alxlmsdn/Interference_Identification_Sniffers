@@ -1,10 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Caches (time a pointer chase to get cache capacity, cache acces latency) 
-// Author: Christopher Celio
-// Date  : 2010 Nov 15
+// Caches (cache acces latency) 
+// Author: Alexander Lumsden 2019 
+// orignal code from: Christopher Celio 2010 
 //
-// Designed to assist in emperically discovering the cache size of a processor
-// by repeatedly running this kernel with varying input sizes. 
+// Designed to determine the latancy of the cache levels of the computer
 //
 // Create an array of size <input>, where each array element is a pointer to
 // another element in the array (circular linked list). Arrange pointers
@@ -12,14 +11,12 @@
 // period of elements to normalize for work/array-size. Thus, any increase in
 // run-time should be localized to caching effects.
 //
-// The input is (at the moment) in "number of elements in the array", 
-// which will be rounded to the nearest cache-line amount. This means that
-// the graphing code should pay attention to the report file, and not the 
-// input file when looking at where to plot a data point. 
+// The input is the size in bytes of the array, 
+// This means that
+// the graphing code should pay attention to the report file. 
 
 //#define DEBUG 
 //#define PRINT_ARRAY
-#define PRINT_SCRIPT_FRIENDLY
                       
 
 // stride in # of elements, most processors have a 64byte cache line, so 16 elements
@@ -50,10 +47,6 @@ double g_run_time;  // choose between stride size, or random stride
 // random access should hit cache-line addresses, to eliminate
 // spatial locality and force more misses.
 int g_stride = CACHELINE_SZ;
-
-double volatile run_time_ns;
-double volatile run_time_s;
-
 
 // Function Declarations
 uint32_t initializeGlobalArrays(uint32_t* arr_n_ptr, uint32_t num_elements, uint32_t stride);
@@ -100,16 +93,6 @@ int main(int argc, char* argv[])
    // gets optimized away! :(
    uint32_t volatile ret_val = threadMain();  
 
-//#ifdef PRINT_SCRIPT_FRIENDLY
-//   fprintf(stdout, "App:[caches],NumThreads:[%d],AppSize:[%d],Time:[%g], TimeUnits:[Time Per Iteration (ns)],NumIterations:[%u],RunTime:[%f]\n",
-//      g_num_cores,
-//      g_num_elements,
-//      ((double) run_time_ns / (double) g_num_iterations),
-//	   g_num_iterations,
-//      g_run_time
-//      );
-//#endif
-
 #ifdef DEBUG
   fprintf(stderr, "Done. Exiting...\n\n");
 #endif
@@ -137,6 +120,7 @@ uint32_t threadMain()
 
    intptr_t idx = 0;
    double volatile elapsed_time = 0;
+   double volatile run_time_s;
 
    while (elapsed_time < g_run_time) {
       // run for g_num_iterations...
@@ -154,14 +138,12 @@ uint32_t threadMain()
       fprintf(stdout, "level:[%s],totalTime[%f],latency[%f]\n", level, elapsed_time, (run_time_s * 1.0E9)/(double)g_num_iterations);
    }
 
-   run_time_s = 0;//((double) (stop_time - start_time)); 
-   run_time_ns = run_time_s * 1.0E9;
-
 #ifdef DEBUG
    fprintf(stderr, "Total_Time (s)             : %g\n", run_time_s);
    fprintf(stderr, "Total_Time (ns)            : %g\n", run_time_ns);
 #endif
 
+   free(arr_n_ptr);
    // prevent compiler from removing ptr chasing...
    // although the receiver must put idx into a volatile variable as well!
    return (uint32_t) idx; 
@@ -321,23 +303,17 @@ uint32_t initializeGlobalArrays(uint32_t* arr_n_ptr, uint32_t num_elements, uint
          uint32_t page_offset = i;
 
 
-         //TODO test for partial page (which is always the last page)...
+         //test for partial page (which is always the last page)...
          if ((int32_t) i >= (int32_t) (num_elements - num_elements_per_page)  //is last page?
             && ((num_elements - i) % num_elements_per_page != 0))  //and last page is partial
          {
-//            printf("PARTIAL PAGE: i=%d >= %d/%d - %d\n", i, num_elements, stride, num_elements_per_page);
             num_elements_per_page = num_elements - i; //num_elements % num_elements_per_page;
-//            printf("PARTIAL PAGE: num_elements_per_page = %d,  total_num_elements = %d, i=%d\n",
-//               num_elements_per_page,  num_elements, i);
          }
 
 
 
          last_idx = initializePage(arr_n_ptr, page_offset, num_elements_per_page/stride, stride, 1);
-//         last_idx = initializePage(arr_n_ptr, page_offset, num_elements_per_page/stride, stride, 2);
-         // tie this page to the next page...
          arr_n_ptr[last_idx] = (i+num_elements_per_page);
-//         printf(" *array[%4d] = %4d, \n", last_idx, arr_n_ptr[last_idx]);
       }
 
 

@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 
-# Author: Christopher Celio
-# Date  : 2010 Nov 6
+# Author: Alexander Lumsden 2019 
+# orignal code from: Christopher Celio 2010
 #   
-# Python script to run memory hierarhcy ukernels, collect data, and generate
+# Python script to run cache latency test, collect data, and generate
 # plots
 
 
@@ -27,22 +27,8 @@ BASE_DIR="./"
 REPORT_DIR=BASE_DIR + "Reports/"
 PLOT_DIR=BASE_DIR + "Plots/"
 DEFAULT_REPORT_NAME = "report.txt"
-DEFAULT_INPUT_NAME = "inputs.txt"
 
-# These are the variables we are going to parse the input and report files for.
-input_variables = (
-    "AppSize",
-    "NumIterations",
-    "RunType"
-    )
- 
 variables = (
-    #"AppSize",
-    #"Time",
-    #"TimeUnits",
-    #"NumIterations",
-    #"RunType",
-    #"NumDataPointsPerSet"
     "level",
     "totalTime",
     "latency"
@@ -62,33 +48,6 @@ try:
 except:
     NOPLOT = True
     print "Failure to import {matplotlib/numpy/pylab}. Graphing turned off."
-
-# pretty-print out the access latency at various levels in the memory hierarchy
-# input "size" (in kB) 
-# freq is in G-cycles per second
-def outputAccessLatency(data, size, memstring, freq):
-    closest_idx = 0
-    closest_dist = 9999999999 #some max number
-    
-    for i in range(len(data["AppSize"])):
-        # only get data from the random RunType
-        if (data["RunType"][i] != "0"):
-            continue
-        datum = data["AppSize"][i]
-        new_dist = abs(size - float(datum))
-        if (new_dist <= closest_dist):
-            closest_dist = new_dist
-            closest_idx = i
-
-    time_ns = data["Time"][closest_idx]
-    cycles = float(time_ns) * freq
-    # pretty print kB vs MB
-    if (float(data["AppSize"][closest_idx]) > 1000):
-        print "  %s Access Latency =  %s ns @(%3g MB), %3.2f cycles" % \
-            (memstring, data["Time"][closest_idx], float(data["AppSize"][closest_idx])/1024, cycles)   
-    else:
-        print "  %s Access Latency =  %s ns @(%3g kB), %3.2f cycles" % \
-            (memstring, data["Time"][closest_idx], float(data["AppSize"][closest_idx]), cycles)   
     
 
 # 1. Parses input file.
@@ -106,17 +65,10 @@ def main():
    
     # 1. Parse inputs.txt file.
     if (not ccbench.NORUN):
-        #inputs = ccbench.parseInputFile(input_filename, variables, ccbench.INPUT_TYPE)
-        #inputs["NumDataPointsPerSet"] = []
-        #inputs["NumDataPointsPerSet"].append(str(len(inputs["AppSize"])))
-
         # Build up the arguments list for each invocation of the benchmark.
         # This is done here, instead of in ccbench.py, because this is custom to each app.
         app_args_list = []
-        #for run_type in inputs["RunType"]: 
-        #    for app_size in inputs["AppSize"]:
-        #        app_args_list.append(str(app_size) + " " \
-        #            + str(inputs["NumIterations"][0]) + " " +str(run_type))
+
         if (ccbench.LEVEL1 != "0"):
             app_args_list.append("L1 " + ccbench.LEVEL1 + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
         if (ccbench.LEVEL2 != "0"):
@@ -127,14 +79,10 @@ def main():
 
     # 2. Execute the benchmark and write to the report file.
     if (not ccbench.NORUN):
-        #ccbench.runBenchmark(app_bin, app_args_list, inputs, input_variables, report_filename)
         ccbench.runBenchmark(app_bin, app_args_list, report_filename)
         
     # 3. Extract Data from the report file.
     data = ccbench.readReportFile(report_filename, variables)
-    sets = collections.OrderedDict()
-    for i in range(len(data["level"])):
-        sets[data["level"][i]] = sets.get(data["level"][i], 0) + 1
     
     # 4. Plot the Data
     #print data
@@ -156,150 +104,37 @@ def main():
     p1 = fig.add_subplot(1,1,1)
 
     print "Plotting time..."
-    #num_datapoints = int(data["NumDataPointsPerSet"][0])
- 
-    # let's convert "appsizearg(#elm)" to "appsize(KB)"
-    #for i in range(len(data["AppSize"])):
-    #    data["AppSize"][i] = str(float(data["AppSize"][i]) * 4 / 1024)
-    #for i in range(len(data["latency"])):
-    #    print(data["totalTime"][i] + "," + data["latency"][i])
+
+    sets = collections.OrderedDict()
+
+    for i in range(len(data["level"])):
+        sets[data["level"][i]] = sets.get(data["level"][i], 0) + 1
 
     prev = 0
     for key, value in sets.items():
         p1.plot(
             data["totalTime"][prev:value+prev],
             data["latency"][prev:value+prev]
-            #linestyle='--',
-            #marker='.'
         )
         #print(key +": "+str(prev) +"," +str(value))
         #print(data["totalTime"][prev:value+prev])
         #print(data["latency"][prev:value+prev])
         prev += value
-    
-    #for i in range(len(data["AppSize"])/num_datapoints):
-    #    srt_idx = i*num_datapoints
-    #    end_idx = (i+1)*num_datapoints
-    #    p1.plot(
-    #        data["AppSize"][srt_idx:end_idx],
-    #        data["Time"][srt_idx:end_idx],
-    #        linestyle='--',
-    #        marker='.'
-    #        )
-    
-    #p1.set_xscale('log')
+
     p1.set_yscale('log')
-    plt.ylabel("latency (ns)")#data["TimeUnits"][0])
-    plt.xlabel('Time')
+    plt.ylabel("latency (ns)")
+    plt.xlabel('Time (s)')
     plt.ylim((1, 320))
     
-    #xmin,xmax=plt.xlim()
-    #plt.xlim((0.5, 1024*64))
-    
-    # deal with ticks
-    #xtick_range = [1,2,4,8,16,32,64, 128,256, 512,1024,2048,4096,4096*2, 16384,16384*2,16384*4]
-    #xtick_names = ['1 kB','2 kB','4 kB','8 kB','16 kB','32 kB','64 kB','128 kB','256 kB','512 kB','1 MB','2 MB','4 MB','8 MB','16 MB','32 MB','64 MB'] #for KB
+ 
     ytick_range = [1,2,4,8,16,32,64,128,256] # in ns / iteration
     ytick_names = ['1','2','4','8','16','32','64','128','256']
-    '''                 
-    if (xmax > 1024*65):
-        xtick_range = [1,2,4,8,16,32,64, 128,256, 512,1024,2048,4096,4096*2, 16384,16384*2,16384*4,1024*128]
-        xtick_names = ['1 kB','2 kB','4 kB','8 kB','16 kB','32 kB','64 kB','128 kB','256 kB','512 kB','1 MB','2 MB','4 MB','8 MB','16 MB','32 MB','64 MB','128 MB'] #for KB
-        plt.xlim((0.5,1024*128))
-                     
-    if (xmax > 1024*128):
-        xtick_range = [1,2,4,8,16,32,64, 128,256, 512,1024,2048,4096,4096*2, 16384,16384*2,16384*4,1024*128,1024*256]
-        xtick_names = ['1 kB','2 kB','4 kB','8 kB','16 kB','32 kB','64 kB','128 kB','256 kB','512 kB','1 MB','2 MB','4 MB','8 MB','16 MB','32 MB','64 MB','128 MB','256 MB'] #for KB
-        plt.xlim((0.5,1024*256))
-    '''
-
-
-    #p1.xaxis.set_major_locator( plt.NullLocator() )
-    #p1.xaxis.set_minor_locator( plt.NullLocator() )
+    
     p1.yaxis.set_major_locator( plt.NullLocator() )
     p1.yaxis.set_minor_locator( plt.NullLocator() )
-    #plt.xticks(
-    #    xtick_range,
-    #    xtick_names,
-    #    rotation='-30',
-    #    size='small' 
-    #    )
     plt.yticks(ytick_range,ytick_names)
     
-    # annotate the graph with pretty cache size lines and info!
-    ylow = 160
-    yhigh = 200
-    #ccprocstats.plotCacheSizeLines(plt, p1, ccbench.PROCESSOR, ylow, yhigh)
-    '''
-    # customize figure title and other doodads based on the processor the test was run on
-    print " ";
-    if (ccbench.PROCESSOR == "merom"):
-        outputAccessLatency(data,     8, "L1      ", 2.33);
-        outputAccessLatency(data,    64, "L2      ", 2.33);
-        outputAccessLatency(data, 16384, "Off-chip", 2.33);
-    if (ccbench.PROCESSOR == "ivybridge"):
-        outputAccessLatency(data,     8, "L1      ", 2.3);
-        outputAccessLatency(data,   128, "L2      ", 2.3);
-        outputAccessLatency(data,  3072, "L3      ", 2.3);
-        outputAccessLatency(data, 16384, "Off-chip", 2.3);
-    elif (ccbench.PROCESSOR == "cuda1"):
-        outputAccessLatency(data,     8, "L1      ", 2.4);
-        outputAccessLatency(data,    64, "L2      ", 2.4);
-        outputAccessLatency(data, 16384, "Off-chip", 2.4);
-    elif (ccbench.PROCESSOR == "tegra2"):
-        outputAccessLatency(data,     8, "L1      ", 0.4);  #umnown
-        outputAccessLatency(data,    64, "L2      ", 0.4);
-        outputAccessLatency(data, 16384, "Off-chip", 0.4);
-    elif (ccbench.PROCESSOR == "tilera"):
-        outputAccessLatency(data,     4, "L1      ", 0.7);
-        outputAccessLatency(data,    32, "L2      ", 0.7);
-        outputAccessLatency(data,  1024, "L3*     ", 0.7);
-        outputAccessLatency(data, 16384, "Off-chip", 0.7);
-    elif (ccbench.PROCESSOR == "tilera-l3"):              #unknown
-        outputAccessLatency(data,     4, "L1      ", 0.7);
-        outputAccessLatency(data,    32, "L2      ", 0.7);
-        outputAccessLatency(data,  1024, "L3      ", 0.7);
-        outputAccessLatency(data, 16384, "Off-chip", 0.7);
-    elif (ccbench.PROCESSOR == "arrandale"):
-        outputAccessLatency(data,     8, "L1      ", 3.0); #unknwno
-        outputAccessLatency(data,    64, "L2      ", 3.0);
-        outputAccessLatency(data,  1024, "L3      ", 3.0);
-        outputAccessLatency(data, 16384, "Off-chip", 3.0);
-    elif (ccbench.PROCESSOR == "bloomfield"):
-        outputAccessLatency(data,     8, "L1      ", 3.4); #unknown
-        outputAccessLatency(data,    64, "L2      ", 3.4);
-        outputAccessLatency(data,  1024, "L3      ", 3.4);
-        outputAccessLatency(data, 16384, "Off-chip", 3.4);
-    elif (ccbench.PROCESSOR == "emerald"):
-        outputAccessLatency(data,     8, "L1      ", 2.27);
-        outputAccessLatency(data,    64, "L2      ", 2.27);
-        outputAccessLatency(data,  1024, "L3      ", 2.27);
-        outputAccessLatency(data, 16384, "L3      ", 2.27);
-        outputAccessLatency(data, 128*1024, "Off-chip", 2.27);
-    elif (ccbench.PROCESSOR == "boxboro"): #boxboro.millennium machine (westmere-ex)
-        outputAccessLatency(data,     8, "L1      ", 2.27);
-        outputAccessLatency(data,    64, "L2      ", 2.27);
-        outputAccessLatency(data,  1024, "L3      ", 2.27);
-        outputAccessLatency(data, 65536, "Off-chip", 2.27);
-        outputAccessLatency(data,262144, "DRAM    ", 2.27);
-    elif (ccbench.PROCESSOR == "bridge"): 
-        outputAccessLatency(data,     8, "L1      ", 3.4);
-        outputAccessLatency(data,    64, "L2      ", 3.4);
-        outputAccessLatency(data,  1024, "L3      ", 3.4);
-        outputAccessLatency(data,262144, "DRAM    ", 3.4);
-    elif (ccbench.PROCESSOR == "mac"):
-        #outputAccessLatency(data,     32, "L1      ", 2.26);
-        #outputAccessLatency(data,    3072, "L2      ", 2.26);
-        #outputAccessLatency(data,  1024, "L3      ", 3.4);
-    else:
-        plt.title("Cache Hierarchy" + r'', fontstyle='italic')
-        print "  Unknown processor - cycle count is assuming a 1 GHz clock"
-        outputAccessLatency(data,     8, "", 1.0);
-        outputAccessLatency(data,    64, "", 1.0);
-        outputAccessLatency(data,  1024, "", 1.0);
-        outputAccessLatency(data, 16384, "", 1.0);
-    print " ";
-    '''
+
     if (ccbench.PLOT_FILENAME == "none"):
         filename = PLOT_DIR + ccbench.generatePlotFileName(APP)
     else:
