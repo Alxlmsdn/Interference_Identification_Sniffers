@@ -16,4 +16,4 @@ $(TARGET): $(OBJECTS)
 	fi
 
 clean:
-	-rm -f *.o *.d $(TARGET)
+	-rm -f *.o *.d *.pyc $(TARGET)
