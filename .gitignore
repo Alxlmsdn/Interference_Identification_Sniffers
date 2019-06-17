@@ -1,0 +1,5 @@
+*.o
+*.pyc
+*.exe
+*.out
+*.app
