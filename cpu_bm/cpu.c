@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "cctimer.h"
+#include <cctimer.h>
 #include <math.h>
 
 uint32_t threadMain();

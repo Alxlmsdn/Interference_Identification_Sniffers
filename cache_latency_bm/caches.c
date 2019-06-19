@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "cctimer.h"
+#include <cctimer.h>
 #include "cclfsr.h"
 #include <math.h>
 

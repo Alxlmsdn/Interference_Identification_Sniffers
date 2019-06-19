@@ -12,7 +12,7 @@ PLOT_POSTER=1
 
 # readjust the Python import path to accept our own common file
 import sys
-#sys.path.append('../common/')
+sys.path.append('../common/')
 import os
 import collections
 
@@ -75,7 +75,7 @@ def main():
             app_args_list.append("L2 " + ccbench.LEVEL2 + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
         if (ccbench.LEVEL3 != "0"):
             app_args_list.append("L3 " + ccbench.LEVEL3 + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
-        print(app_args_list)
+        #print(app_args_list)
 
     # 2. Execute the benchmark and write to the report file.
     if (not ccbench.NORUN):

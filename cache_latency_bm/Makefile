@@ -1,10 +1,10 @@
 TARGET=caches
-SOURCES:=caches.c cclfsr.c cctimer.c 
+SOURCES:=caches.c cclfsr.c ../common/cctimer.c 
 
 OBJECTS ?= $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(SOURCES) ) ) )
 
 CC=gcc
-CFLAGS=-std=c99 -mtune=native -O3 -funroll-loops -Wall
+CFLAGS=-std=c99 -mtune=native -O3 -funroll-loops -I../common -Wall
 LD_LIBS=-lpthread -lm
 
 # Build targets
@@ -16,4 +16,4 @@ $(TARGET): $(OBJECTS)
 	fi
 
 clean:
-	-rm -f *.o *.d *.pyc $(TARGET)
+	-rm -f *.o *.d *.pyc ../common/*.o ../common/*.pyc $(TARGET)
