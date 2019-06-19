@@ -143,6 +143,7 @@ def controller():
     global LEVEL3
     global ITERATIONS
     global MIN_RUN_TIME
+    global THREADS
     
     #create instance of Option Parser Module, included in Standard Library
     p = optparse.OptionParser(description='CLI Controller for memory system u-kernels',
@@ -188,6 +189,9 @@ def controller():
     p.add_option('--minRunTime', '-t', dest = 'minRunTime',
                   help='minimum length of runtime for cache test',
                   default = "0.75")
+    p.add_option('--numThreads', dest = 'numThreads',
+                  help='number of threads to create',
+                  default = "1")            
 
     #option Handling passes correct parameter to runBash 
     options, arguments = p.parse_args()
@@ -204,6 +208,7 @@ def controller():
     LEVEL3         = options.level3
     ITERATIONS     = options.iterations
     MIN_RUN_TIME   = options.minRunTime
+    THREADS        = options.numThreads
 
 
 # 1. Parse inputs file
