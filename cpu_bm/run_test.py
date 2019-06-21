@@ -102,7 +102,13 @@ def main():
     sets = collections.OrderedDict()
 
     for i in range(len(data["thread"])):
-        sets[data["thread"][i]] = sets.get(data["thread"][i], 0) + 1
+        #sets[data["thread"][i]] = sets.get(data["thread"][i], 0) + 1
+        thread = data["thread"][i]
+        if thread in sets:
+            sets[thread][0].append(data["totalTime"])
+            sets[thread][1].append(data["runTime"])
+        else:
+            sets[thread] = [[][]]
 
     prev = 0
     for key, value in sets.items():
