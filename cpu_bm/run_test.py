@@ -68,8 +68,8 @@ def main():
         # Build up the arguments list for each invocation of the benchmark.
         # This is done here, instead of in ccbench.py, because this is custom to each app.
         app_args_list = []
-        for i in range(int(ccbench.THREADS)):
-            app_args_list.append(str(i) + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
+        #for i in range(int(ccbench.THREADS)):
+        app_args_list.append(ccbench.THREADS + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
         print(app_args_list)
 
     # 2. Execute the benchmark and write to the report file.
@@ -105,21 +105,24 @@ def main():
         #sets[data["thread"][i]] = sets.get(data["thread"][i], 0) + 1
         thread = data["thread"][i]
         if thread in sets:
-            sets[thread][0].append(data["totalTime"])
-            sets[thread][1].append(data["runTime"])
+            sets[thread][0].append(data["totalTime"][i])
+            sets[thread][1].append(data["runTime"][i])
         else:
-            sets[thread] = [[][]]
+            sets[thread] = [[data["totalTime"][i]],[data["runTime"][i]]]
+        print(sets)
 
-    prev = 0
+    #prev = 0
     for key, value in sets.items():
         p1.plot(
-            data["totalTime"][prev:value+prev],
-            data["runTime"][prev:value+prev]
+            value[0],
+            value[1]
+            #data["totalTime"][prev:value+prev],
+            #data["runTime"][prev:value+prev]
         )
         #print(key +": "+str(prev) +"," +str(value))
         #print(data["totalTime"][prev:value+prev])
         #print(data["latency"][prev:value+prev])
-        prev += value
+        #prev += value
 
     #p1.set_yscale('log')
     plt.ylabel("time to compute (ms)")
