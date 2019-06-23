@@ -110,11 +110,13 @@ def main():
             sets[thread] = [[data["totalTime"][i]],[data["runTime"][i]]]
 
     for key, value in sets.items():
+        plot_label = 'Thread ' + key
         p1.plot(
             value[0],
-            value[1]
+            value[1],
+            label= plot_label
         )
-
+    plt.legend(loc='upper left')
     plt.ylabel("time to compute (ms)")
     plt.xlabel('Time (s)')
     
