@@ -22,4 +22,6 @@ cpu_thread_t** setThreads(void (*f)(void *), int);
 
 void * setAffinity();
 
+void freeCPUSet(cpu_set_t*);
+
 

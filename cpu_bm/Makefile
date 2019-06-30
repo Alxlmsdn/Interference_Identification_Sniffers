@@ -1,5 +1,5 @@
 TARGET=cpu
-SOURCES:=cpu.c ../common/cctimer.c 
+SOURCES:=cpu.c ../common/cctimer.c ../common/threadaffinity.c
 
 OBJECTS ?= $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(SOURCES) ) ) )
 

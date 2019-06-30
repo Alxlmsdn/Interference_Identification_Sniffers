@@ -35,11 +35,7 @@ static double average_times[4] = {0};
 static double num_bytes[4];
 
 int main(int argc, char* argv[]) {
-    //cctime_t first = cc_get_seconds(0);
-    //cctime_t second = cc_get_seconds(0);
-    //while((second = cc_get_seconds(0)) == first);
-    //fprintf(stdout, "first: %f\n second: %f\n difference: %f", first, second, (second - first) * 1e3);
-    //return 0;
+
     if (argc != 4) {
         fprintf(stderr, "Usage: <number of threads> <array size> <number of iterations>\n");
         return 1;

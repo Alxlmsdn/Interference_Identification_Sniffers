@@ -14,10 +14,12 @@
 #include <stdint.h>
 #include <pthread.h>
 #include <cctimer.h>
+#include <threadaffinity.h>
 #include <math.h>
+#include <unistd.h>
 
 uint32_t threadMain();
-void* testing();
+void testing();
 pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 uint32_t prime_number;
 double run_time;
@@ -28,29 +30,27 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    uint32_t num_threads = atoi(argv[1]);
+    //uint32_t num_threads = atoi(argv[1]);
+    int num_cores = sysconf(_SC_NPROCESSORS_CONF);
     prime_number = atoi(argv[2]);
     run_time = atof(argv[3]);
-    pthread_t threads[num_threads];
-    uint32_t thread_id[num_threads];
 
-    for (uint32_t i = 0 ; i < num_threads ; i++) {
-        thread_id[i] = i;
-        //pthread_create(&threads[i], NULL, threadMain, &thread_id[i]);
-        pthread_create(&threads[i], NULL, testing, &thread_id[i]);
+    cpu_thread_t** threads = setThreads(testing, num_cores);
+    for(uint32_t i = 0 ; i < num_cores ; i++) {
+        pthread_join(*(threads[i]->thread), NULL);
     }
-    for(uint32_t i = 0 ; i < num_threads ; i++) {
-        pthread_join(threads[i], NULL);
-    }
-
-    //uint32_t volatile ret_val = threadMain(prime_number, run_time);
+    for(uint32_t i = 0 ; i < num_cores ; i++) {
+        freeCPUSet(threads[i]->cpu_set);
+        free(threads[i]);
+    } 
+    free(threads);
 
     return 0;
 }
 
-void* testing(void* id) {
+void testing(void* id) {
     uint32_t ret_val = threadMain(id);
-    return NULL;
+    //return NULL;
 }
 
 uint32_t threadMain(void* id) {

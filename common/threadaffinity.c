@@ -51,3 +51,7 @@ void * setAffinity(void * param) {
     }
     return (void *) 0;
 }
+
+void freeCPUSet(cpu_set_t* c_set) {
+    CPU_FREE(c_set);
+}
