@@ -19,6 +19,7 @@
 #include <float.h>
 #include <limits.h>
 #include <cctimer.h>
+#include <threadaffinity.h>
 #include <pthread.h>
 #include <sched.h>
 //#include <sys/sysinfo.h>
@@ -27,7 +28,7 @@
 
 #define STREAM_ELEMENTS double
 
-void* setAffinity();
+void memory_bw_bm(void *);
 
 static STREAM_ELEMENTS *a, *b, *c;
 static double average_times[4] = {0};
@@ -43,7 +44,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Usage: <number of threads> <array size> <number of iterations>\n");
         return 1;
     }
-    uint32_t num_threads = atoi(argv[1]);
+    //uint32_t num_threads = atoi(argv[1]);
     uint32_t array_size = atoi(argv[2]);
     uint32_t iterations = atoi(argv[3]);
 
@@ -56,38 +57,24 @@ int main(int argc, char* argv[]) {
     num_bytes[2] = 3 * sizeof(STREAM_ELEMENTS) * array_size;
     num_bytes[3] = 3 * sizeof(STREAM_ELEMENTS) * array_size;
 
-    int num_cores_available = sysconf(_SC_NPROCESSORS_ONLN);
-    int num_cores_total = sysconf(_SC_NPROCESSORS_CONF);
+    int num_cores = sysconf(_SC_NPROCESSORS_CONF);
+
+    cpu_thread_t** threads = setThreads(memory_bw_bm, num_cores);
 
 #ifdef DEBUG
-    fprintf(stdout, "number of cores available: %d, from total cores: %d", num_cores_available, num_cores_total);
+    fprintf(stdout, "number of threads: %d\n", num_cores);
 #endif
 
-    pthread_t threads[num_cores_total];
-    uint32_t thread_id[num_cores_total];
-
-    for (uint32_t i = 0 ; i < num_cores_total; i ++) {
-        thread_id[i] = i;
-        pthread_create(&threads[i], NULL, setAffinity, &thread_id[i]);
+    for(uint32_t i = 0; i < num_cores; i++) {
+        pthread_join(*(threads[i]->thread), NULL);
     }
-    for(uint32_t i = 0; i < num_cores_total; i++) {
-        pthread_join(threads[i], NULL);
-    }
-
+#ifdef DEBUG
+    fprintf(stdout, "....Finished....\n");
+#endif
     return 0;
 }
 
-
-void* setAffinity(int* id) {
-    uint32_t thread_id = *(uint32_t *) id;
-    pthread_t thread = pthread_self();
-    cpu_set_t* cpu = CPU_ALLOC(1);
-    int size = CPU_ALLOC_SIZE(1);
-    CPU_ZERO_S(size, cpu);
-    CPU_SET_S(thread_id, size, cpu);
-    int s = pthread_setaffinity_np(thread, size, cpu);
-    if (s != 0) {
-        pthread_exit((void *) 1);
-    }
-    fprintf(stdout, "Thread %d succeded\n", thread_id);
+void memory_bw_bm(void* tid) {
+    uint32_t id = *(uint32_t*) tid;
+    fprintf(stdout, "done %d\n", id);
 }
