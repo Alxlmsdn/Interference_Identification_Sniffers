@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+//struct that holds information about the thread that runs on a specific core
 typedef struct cputhread {
         pthread_t* thread;
         cpu_set_t* cpu_set;

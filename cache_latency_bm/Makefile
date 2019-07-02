@@ -1,5 +1,5 @@
 TARGET=caches
-SOURCES:=caches.c cclfsr.c ../common/cctimer.c 
+SOURCES:=caches.c cclfsr.c ../common/cctimer.c ../common/threadaffinity.c
 
 OBJECTS ?= $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(SOURCES) ) ) )
 

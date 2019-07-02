@@ -22,7 +22,6 @@
 #include <threadaffinity.h>
 #include <pthread.h>
 #include <sched.h>
-//#include <sys/sysinfo.h>
 
 #define DEBUG
 
@@ -33,6 +32,7 @@ void memory_bw_bm(void *);
 static STREAM_ELEMENTS *a, *b, *c;
 static double average_times[4] = {0};
 static double num_bytes[4];
+pthread_mutex_t console_mutex;
 
 int main(int argc, char* argv[]) {
 
@@ -43,6 +43,9 @@ int main(int argc, char* argv[]) {
     //uint32_t num_threads = atoi(argv[1]);
     uint32_t array_size = atoi(argv[2]);
     uint32_t iterations = atoi(argv[3]);
+    if (pthread_mutex_init(&console_mutex, NULL) != 0) {
+        fprintf(stdout, "mutex failed\n");
+    }
 
     a = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
     b = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
@@ -64,6 +67,12 @@ int main(int argc, char* argv[]) {
     for(uint32_t i = 0; i < num_cores; i++) {
         pthread_join(*(threads[i]->thread), NULL);
     }
+    for(uint32_t i = 0; i < num_cores; i++) {
+        freeCPUSet(threads[i]->cpu_set);
+        free(threads[i]);
+    }
+    free(threads);
+    
 #ifdef DEBUG
     fprintf(stdout, "....Finished....\n");
 #endif

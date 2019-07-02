@@ -20,7 +20,7 @@
 
 uint32_t threadMain();
 void testing();
-pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t console_mutex;
 uint32_t prime_number;
 double run_time;
 
@@ -29,7 +29,9 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "usage: <number of threads> <prime number to be used> <length of program run time>\n");
         return 1;
     }
-
+    if (pthread_mutex_init(&console_mutex, NULL) != 0){
+         fprintf(stdout, "mutex failed\n");
+    }
     //uint32_t num_threads = atoi(argv[1]);
     int num_cores = sysconf(_SC_NPROCESSORS_CONF);
     prime_number = atoi(argv[2]);
@@ -50,7 +52,6 @@ int main(int argc, char* argv[]) {
 
 void testing(void* id) {
     uint32_t ret_val = threadMain(id);
-    //return NULL;
 }
 
 uint32_t threadMain(void* id) {
@@ -70,9 +71,9 @@ uint32_t threadMain(void* id) {
         cctime_t volatile stop_time = cc_get_seconds(0);
         run_time_s = (double) stop_time - start_time;
         elapsed_time += run_time_s;
-        pthread_mutex_lock(&mutex1);
+        pthread_mutex_lock(&console_mutex);
         fprintf(stdout, "thread:[%d],runTime:[%f],totalTime:[%f]\n", *thread_id, run_time_s * 1.0E3, elapsed_time);
-        pthread_mutex_unlock(&mutex1);
+        pthread_mutex_unlock(&console_mutex);
     }
     return ret;
 }
