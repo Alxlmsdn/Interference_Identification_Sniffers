@@ -10,7 +10,6 @@
 //      determining the bandwidth of cache levels. 
 //
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -21,7 +20,6 @@
 #include <cctimer.h>
 #include <threadaffinity.h>
 #include <pthread.h>
-#include <sched.h>
 
 #define DEBUG
 
