@@ -21,13 +21,12 @@
 #include <threadaffinity.h>
 #include <pthread.h>
 
-#define DEBUG
+//#define DEBUG
 
 #define STREAM_ELEMENTS double
 
 void memory_bw_bm(void *);
 
-static STREAM_ELEMENTS *a, *b, *c;
 static uint32_t iterations;
 static uint32_t array_size;
 static double average_times[4] = {0};
@@ -36,21 +35,16 @@ pthread_mutex_t console_mutex;
 
 int main(int argc, char* argv[]) {
 
-    if (argc != 4) {
-        fprintf(stderr, "Usage: <number of threads> <array size> <number of iterations>\n");
+    if (argc != 3) {
+        fprintf(stderr, "Usage: <array size> <number of iterations>\n");
         return 1;
     }
-    //uint32_t num_threads = atoi(argv[1]);
-    array_size = atoi(argv[2]);
-    iterations = atoi(argv[3]);
+    array_size = atoi(argv[1]);
+    iterations = atoi(argv[2]);
     if (pthread_mutex_init(&console_mutex, NULL) != 0) {
         fprintf(stdout, "mutex failed\n");
     }
 
-    /* a = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
-    b = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
-    c = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
-    */
     num_bytes[0] = 2 * sizeof(STREAM_ELEMENTS) * array_size;
     num_bytes[1] = 2 * sizeof(STREAM_ELEMENTS) * array_size;
     num_bytes[2] = 3 * sizeof(STREAM_ELEMENTS) * array_size;
@@ -84,6 +78,7 @@ void memory_bw_bm(void* tid) {
     //fprintf(stdout, "done %d\n", id);
     STREAM_ELEMENTS times[4][iterations];
     double elapsed_times[4][iterations];
+    STREAM_ELEMENTS *a, *b, *c;
     a = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
     b = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
     c = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
@@ -122,6 +117,12 @@ void memory_bw_bm(void* tid) {
         }
         times[3][n] = cc_get_seconds(0) - times[3][n];
         elapsed_time += times[3][n];
-        fprintf(stdout, "thread:[%d],rate:[%f](bytes/s),totalTime:[%f](s)\n", id, num_bytes[3]/times[3][n], elapsed_time);
+        pthread_mutex_lock(&console_mutex);
+        fprintf(stdout, "thread:[%d],rate:[%f](MB/s),totalTime:[%f](s)\n", id, 1e-6*num_bytes[3]/times[3][n], elapsed_time);
+        pthread_mutex_unlock(&console_mutex);
     }
+
+    free(a);
+    free(b);
+    free(c);
 }

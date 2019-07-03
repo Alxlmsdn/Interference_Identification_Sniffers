@@ -31,7 +31,7 @@ DEFAULT_REPORT_NAME = "report.txt"
 variables = (
     "thread",
     "totalTime",
-    "runTime"
+    "rate"
     )
  
 # Sometimes we run on remote platforms without access to matplotlib.  In this
@@ -69,7 +69,7 @@ def main():
         # This is done here, instead of in ccbench.py, because this is custom to each app.
         app_args_list = []
         #for i in range(int(ccbench.THREADS)):
-        app_args_list.append(ccbench.THREADS + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
+        app_args_list.append(ccbench.SIZE + " " + ccbench.ITERATIONS)
         #print(app_args_list)
 
     # 2. Execute the benchmark and write to the report file.
@@ -105,9 +105,9 @@ def main():
         thread = data["thread"][i]
         if thread in sets:
             sets[thread][0].append(data["totalTime"][i])
-            sets[thread][1].append(data["runTime"][i])
+            sets[thread][1].append(data["rate"][i])
         else:
-            sets[thread] = [[data["totalTime"][i]],[data["runTime"][i]]]
+            sets[thread] = [[data["totalTime"][i]],[data["rate"][i]]]
 
     for key, value in sets.items():
         plot_label = 'Thread ' + key
@@ -117,7 +117,7 @@ def main():
             label= plot_label
         )
     plt.legend(loc='upper left')
-    plt.ylabel("time to compute (ms)")
+    plt.ylabel("rate (MB/s)")
     plt.xlabel('Time (s)')
     
  
