@@ -144,6 +144,7 @@ def controller():
     global ITERATIONS
     global MIN_RUN_TIME
     global THREADS
+    global SIZE
     
     #create instance of Option Parser Module, included in Standard Library
     p = optparse.OptionParser(description='CLI Controller for memory system u-kernels',
@@ -191,7 +192,10 @@ def controller():
                   default = "0.75")
     p.add_option('--numThreads', dest = 'numThreads',
                   help='number of threads to create',
-                  default = "1")            
+                  default = "1") 
+    p.add_option('--size', '-s', dest = 'size',
+                  help='size of array in elements',
+                  default= "10000000")           
 
     #option Handling passes correct parameter to runBash 
     options, arguments = p.parse_args()
@@ -209,6 +213,7 @@ def controller():
     ITERATIONS     = options.iterations
     MIN_RUN_TIME   = options.minRunTime
     THREADS        = options.numThreads
+    SIZE           = options.size
 
 
 # 1. Parse inputs file

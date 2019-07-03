@@ -14,11 +14,13 @@
 #include <stdint.h>
 #include <pthread.h>
 #include <cctimer.h>
+#include <threadaffinity.h>
 #include <math.h>
+#include <unistd.h>
 
 uint32_t threadMain();
-void* testing();
-pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+void testing();
+pthread_mutex_t console_mutex;
 uint32_t prime_number;
 double run_time;
 
@@ -27,30 +29,29 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "usage: <number of threads> <prime number to be used> <length of program run time>\n");
         return 1;
     }
-
-    uint32_t num_threads = atoi(argv[1]);
+    if (pthread_mutex_init(&console_mutex, NULL) != 0){
+         fprintf(stdout, "mutex failed\n");
+    }
+    //uint32_t num_threads = atoi(argv[1]);
+    int num_cores = sysconf(_SC_NPROCESSORS_CONF);
     prime_number = atoi(argv[2]);
     run_time = atof(argv[3]);
-    pthread_t threads[num_threads];
-    uint32_t thread_id[num_threads];
 
-    for (uint32_t i = 0 ; i < num_threads ; i++) {
-        thread_id[i] = i;
-        //pthread_create(&threads[i], NULL, threadMain, &thread_id[i]);
-        pthread_create(&threads[i], NULL, testing, &thread_id[i]);
+    cpu_thread_t** threads = setThreads(testing, num_cores);
+    for(uint32_t i = 0 ; i < num_cores ; i++) {
+        pthread_join(*(threads[i]->thread), NULL);
     }
-    for(uint32_t i = 0 ; i < num_threads ; i++) {
-        pthread_join(threads[i], NULL);
-    }
-
-    //uint32_t volatile ret_val = threadMain(prime_number, run_time);
+    for(uint32_t i = 0 ; i < num_cores ; i++) {
+        freeCPUSet(threads[i]->cpu_set);
+        free(threads[i]);
+    } 
+    free(threads);
 
     return 0;
 }
 
-void* testing(void* id) {
+void testing(void* id) {
     uint32_t ret_val = threadMain(id);
-    return NULL;
 }
 
 uint32_t threadMain(void* id) {
@@ -70,9 +71,9 @@ uint32_t threadMain(void* id) {
         cctime_t volatile stop_time = cc_get_seconds(0);
         run_time_s = (double) stop_time - start_time;
         elapsed_time += run_time_s;
-        pthread_mutex_lock(&mutex1);
+        pthread_mutex_lock(&console_mutex);
         fprintf(stdout, "thread:[%d],runTime:[%f],totalTime:[%f]\n", *thread_id, run_time_s * 1.0E3, elapsed_time);
-        pthread_mutex_unlock(&mutex1);
+        pthread_mutex_unlock(&console_mutex);
     }
     return ret;
 }

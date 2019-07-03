@@ -1,5 +1,6 @@
 TARGET=cpu
-SOURCES:=cpu.c ../common/cctimer.c 
+SOURCES:=cpu.c ../common/cctimer.c ../common/threadaffinity.c
+DEPS := ../common/cctimer.h ../common/thread/affinity.h
 
 OBJECTS ?= $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(SOURCES) ) ) )
 
@@ -10,10 +11,15 @@ LD_LIBS=-lpthread -lm
 # Build targets
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS)
-	if $(foreach source,$(OBJECTS),[ $(source) -nt $(TARGET) ] ||) 1; \
-	then $(CC) $(CFLAGS) $^ -o $@ $(LD_LIBS); \
-	fi
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
+$(TARGET): $(OBJECTS)
+	#if $(foreach source,$(OBJECTS),[ $(source) -nt $(TARGET) ] ||) 1; \
+	#then $(CC) $(CFLAGS) $^ -o $@ $(LD_LIBS); \
+	#fi
+	$(CC) $(CFLAGS) $^ -o $@ $(LD_LIBS)
+
+.PHONY: clean
 clean:
 	-rm -f *.o *.d *.pyc ../common/*.o $(TARGET)

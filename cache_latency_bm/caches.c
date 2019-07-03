@@ -29,16 +29,19 @@
 #define PAGE_SZ (4096) 
 
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <cctimer.h>
+#include <threadaffinity.h>
 #include "cclfsr.h"
 #include <math.h>
 
 // Global Variables
-uint32_t  g_num_cores;
 uint32_t  g_num_elements;  
 uint32_t  g_num_iterations;
+pthread_mutex_t console_mutex;
 //uint32_t  g_performed_iterations;
 
 char *level;
@@ -50,7 +53,8 @@ int g_stride = CACHELINE_SZ;
 
 // Function Declarations
 uint32_t initializeGlobalArrays(uint32_t* arr_n_ptr, uint32_t num_elements, uint32_t stride);
-uint32_t threadMain();
+uint32_t threadMain(uint32_t);
+void threadStart(void *);
 
 uint32_t printArray(uint32_t iter, uint32_t *arr_ptr, uint32_t num_elements, uint32_t stride);
 uint32_t verifyArray(uint32_t *arr_ptr, uint32_t num_elements, uint32_t stride);
@@ -72,7 +76,9 @@ int main(int argc, char* argv[])
    g_num_elements   = atoi(argv[2]) / 4;
    g_num_iterations = atoi(argv[3]);
    g_run_time       = atof(argv[4]);
-
+   if (pthread_mutex_init(&console_mutex, NULL) != 0){
+         fprintf(stdout, "mutex failed\n");
+   }
 
 #ifdef DEBUG
    fprintf(stderr, "Size of the array     = %d\n",  g_num_elements);
@@ -88,10 +94,26 @@ int main(int argc, char* argv[])
 #ifdef DEBUG
    printf(" Adjusted Num of Elements: %d\n\n", g_num_elements);
 #endif
+   if (strcmp(level, "L3") != 0) {
+      int num_cores = sysconf(_SC_NPROCESSORS_CONF);
+      cpu_thread_t** threads = setThreads(threadStart, num_cores);  
 
+      for(uint32_t i = 0 ; i < num_cores ; i++) {
+         pthread_join(*(threads[i]->thread), NULL);
+      }
+      for(uint32_t i = 0 ; i < num_cores ; i++) {
+         freeCPUSet(threads[i]->cpu_set);
+         free(threads[i]);
+      } 
+      free(threads); 
+   }
+   else {
+      uint32_t volatile ret_val = threadMain(0);
+   }
+   
    // this volatile ret_val is crucial, otherwise the entire run-loop 
    // gets optimized away! :(
-   uint32_t volatile ret_val = threadMain();  
+   //uint32_t volatile ret_val = threadMain();  
 
 #ifdef DEBUG
   fprintf(stderr, "Done. Exiting...\n\n");
@@ -100,11 +122,15 @@ int main(int argc, char* argv[])
   return 0;
 }
 
+void threadStart(void *tid) {
+      uint32_t id = *(uint32_t *) tid;
+      uint32_t volatile ret_val = threadMain(id); 
+}
 
-uint32_t threadMain()
+
+uint32_t threadMain(uint32_t id)
 {
    uint32_t* arr_n_ptr;
-
    // pad out memory to next PAGE_SZ to make initialization easier...
    uint32_t num_total_elements_per_page = PAGE_SZ/sizeof(uint32_t);
    int num_elements_allocated = g_num_elements + (num_total_elements_per_page - (g_num_elements % num_total_elements_per_page));
@@ -121,7 +147,6 @@ uint32_t threadMain()
    intptr_t idx = 0;
    double volatile elapsed_time = 0;
    double volatile run_time_s;
-
    while (elapsed_time < g_run_time) {
       // run for g_num_iterations...
       cctime_t volatile start_time = cc_get_seconds(0); 
@@ -131,11 +156,11 @@ uint32_t threadMain()
             idx = arr_n_ptr[idx];
       }
       cctime_t volatile stop_time = cc_get_seconds(0);
-
       run_time_s = (double) stop_time - start_time;
       elapsed_time += run_time_s;
-
-      fprintf(stdout, "level:[%s],totalTime[%f],latency[%f]\n", level, elapsed_time, (run_time_s * 1.0E9)/(double)g_num_iterations);
+      pthread_mutex_lock(&console_mutex);
+      fprintf(stdout, "level:[%s],thread:[%d],totalTime:[%f],latency:[%f]\n", level, id, elapsed_time, (run_time_s * 1.0E9)/(double)g_num_iterations);
+      pthread_mutex_unlock(&console_mutex);
    }
 
 #ifdef DEBUG

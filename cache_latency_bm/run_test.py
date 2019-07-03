@@ -30,6 +30,7 @@ DEFAULT_REPORT_NAME = "report.txt"
 
 variables = (
     "level",
+    "thread",
     "totalTime",
     "latency"
     )
@@ -107,19 +108,37 @@ def main():
 
     sets = collections.OrderedDict()
 
-    for i in range(len(data["level"])):
-        sets[data["level"][i]] = sets.get(data["level"][i], 0) + 1
+    #for i in range(len(data["level"])):
+    #    sets[data["level"][i]] = sets.get(data["level"][i], 0) + 1
+    for i in range(len(data["thread"])):
+        level = data["level"][i]
+        thread = data["thread"][i]
+        if level not in sets:
+            sets[level] = collections.OrderedDict()
 
-    prev = 0
-    for key, value in sets.items():
-        p1.plot(
-            data["totalTime"][prev:value+prev],
-            data["latency"][prev:value+prev]
-        )
-        #print(key +": "+str(prev) +"," +str(value))
-        #print(data["totalTime"][prev:value+prev])
-        #print(data["latency"][prev:value+prev])
-        prev += value
+        if thread in sets.get(level):
+                sets[level][thread][0].append(data["totalTime"][i])
+                sets[level][thread][1].append(data["latency"][i])
+        else:
+            sets[level][thread] = [[data["totalTime"][i]],[data["latency"][i]]]
+
+    #prev = 0
+    #for key, value in sets.items():
+    #    p1.plot(
+    #        data["totalTime"][prev:value+prev],
+    #        data["latency"][prev:value+prev]
+    #    )
+    #    prev += value
+
+    for level, threads in sets.items():
+        for thread, times in threads.items():
+            plot_label = 'Thread ' + thread
+            p1.plot(
+                times[0],
+                times[1],
+                label= plot_label
+            )
+    plt.legend(loc='upper left')
 
     p1.set_yscale('log')
     plt.ylabel("latency (ns)")
