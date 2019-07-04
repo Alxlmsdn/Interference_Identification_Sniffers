@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 uint32_t threadMain();
-void testing();
+void cpu_bm(void *);
 pthread_mutex_t console_mutex;
 uint32_t prime_number;
 double run_time;
@@ -37,20 +37,21 @@ int main(int argc, char* argv[]) {
     prime_number = atoi(argv[2]);
     run_time = atof(argv[3]);
 
-    cpu_thread_t** threads = setThreads(testing, num_cores);
+    cpu_thread_t** threads = setThreads(cpu_bm, num_cores);
     for(uint32_t i = 0 ; i < num_cores ; i++) {
         pthread_join(*(threads[i]->thread), NULL);
     }
     for(uint32_t i = 0 ; i < num_cores ; i++) {
         freeCPUSet(threads[i]->cpu_set);
         free(threads[i]);
-    } 
+    }
+    fflush(stdout); 
     free(threads);
 
     return 0;
 }
 
-void testing(void* id) {
+void cpu_bm(void* id) {
     uint32_t ret_val = threadMain(id);
 }
 

@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
         free(threads[i]);
     }
     free(threads);
-
+    
 #ifdef DEBUG
     fprintf(stdout, "....Finished....\n");
 #endif
@@ -58,5 +58,14 @@ int main(int argc, char* argv[]) {
 
 
 void disk_bw_bm(void *tid) {
+  uint32_t id = *(uint32_t *) tid;
+  //fprintf(stdout, "Core ID: %d\n", id);
+  char* filename = "thread_" + id + "_file.txt";
+  int fd = open(filename, );
+  if (fd == -1) {
+    fprintf(stdout, "Error opening %s", filename);
+    pthread_exit((void *) 1);
+  }
 
+  
 }
