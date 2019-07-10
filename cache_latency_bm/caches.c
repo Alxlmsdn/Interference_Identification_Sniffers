@@ -35,7 +35,7 @@
 #include <stdint.h>
 #include <cctimer.h>
 #include <threadaffinity.h>
-#include "cclfsr.h"
+#include <cclfsr.h>
 #include <math.h>
 
 // Global Variables
@@ -105,6 +105,7 @@ int main(int argc, char* argv[])
          freeCPUSet(threads[i]->cpu_set);
          free(threads[i]);
       } 
+      fflush(stdout);
       free(threads); 
    }
    else {

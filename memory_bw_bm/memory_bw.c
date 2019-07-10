@@ -65,6 +65,7 @@ int main(int argc, char* argv[]) {
         freeCPUSet(threads[i]->cpu_set);
         free(threads[i]);
     }
+    fflush(stdout);
     free(threads);
     
 #ifdef DEBUG

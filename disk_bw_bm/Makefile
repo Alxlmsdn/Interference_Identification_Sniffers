@@ -1,6 +1,6 @@
 TARGET=disk_bw
-SOURCES:=disk_bw.c ../common/cctimer.c ../common/threadaffinity.c
-DEPS := ../common/cctimer.h ../common/thread/affinity.h
+SOURCES:=disk_bw.c ../common/cctimer.c ../common/threadaffinity.c ../common/cclfsr.c
+DEPS := ../common/cctimer.h ../common/thread/affinity.h ../common/cclfsr.h
 
 OBJECTS ?= $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(SOURCES) ) ) )
 
