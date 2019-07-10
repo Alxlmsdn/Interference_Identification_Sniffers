@@ -137,7 +137,7 @@ void disk_bw_bm(void *tid) {
         double stop_time = cc_get_seconds(0);
         elapsed_time += (stop_time - start_time);
         pthread_mutex_lock(&console_mutex);
-        fprintf(stdout, "Thread:[%d], Bytes:[%lu], runTime(ms):[%f], totalTime:[%f]\n", id, length, 1e3 * (stop_time - start_time), elapsed_time);
+        fprintf(stdout, "thread:[%d], Bytes:[%lu], runTime(ms):[%f], totalTime:[%f]\n", id, length, 1e3 * (stop_time - start_time), elapsed_time);
         pthread_mutex_unlock(&console_mutex);
     }
 
