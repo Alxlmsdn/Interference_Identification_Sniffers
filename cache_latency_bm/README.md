@@ -1,8 +1,8 @@
 Running ./caches:
-    sizeOfCacheLevel iterations runTime
-    32000 10000987 0.75
+    level sizeOfCacheLevel iterations runTime
+    L1 32768 67108864 0.75
 
 using run_test.py:
-    ./run_test.py -1 32000 -2 3000000 -i 10000987 -t 0.75
+    ./run_test.py -1 32768 -2 3145728 -i 67108864 -t 0.75
 
     
