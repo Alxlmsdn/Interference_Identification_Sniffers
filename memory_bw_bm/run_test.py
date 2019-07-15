@@ -47,7 +47,7 @@ try:
     import pylab
 except:
     NOPLOT = True
-    print "Failure to import {matplotlib/numpy/pylab}. Graphing turned off."
+    print("Failure to import {matplotlib/numpy/pylab}. Graphing turned off.")
     
 
 # 1. Parses input file.
@@ -97,7 +97,7 @@ def main():
     
     p1 = fig.add_subplot(1,1,1)
 
-    print "Plotting time..."
+    print("Plotting time...")
 
     sets = collections.OrderedDict()
 
@@ -112,8 +112,8 @@ def main():
     for key, value in sets.items():
         plot_label = 'Thread ' + key
         p1.plot(
-            value[0],
-            value[1],
+            [float(i) for i in value[0]],
+            [float(i) for i in value[1]],
             label= plot_label
         )
     plt.legend(loc='upper left')
@@ -141,8 +141,8 @@ def main():
         filename = os.path.splitext(filename)[0]
         
     plt.savefig(filename)
-    print "Used report filename             : " + report_filename 
-    print "Finished Plotting, saved as file : " + filename + ".pdf"
+    print( "Used report filename             : " + report_filename)
+    print("Finished Plotting, saved as file : " + filename + ".pdf")
 
 
 

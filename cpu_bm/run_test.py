@@ -39,15 +39,15 @@ variables = (
 # We'll just graph from the report file at a later date on another machine.
 NOPLOT = False
 try:
-    import matplotlib
-    matplotlib.use('PDF') # must be called immediately, and before import pylab
+    #import matplotlib
+    #matplotlib.use('PDF') # must be called immediately, and before import pylab
                           # sets the back-end for matplotlib
     import matplotlib.pyplot as plt
     import numpy as np
-    import pylab
+    #import pylab
 except:
     NOPLOT = True
-    print "Failure to import {matplotlib/numpy/pylab}. Graphing turned off."
+    print("Failure to import {matplotlib/numpy/pylab}. Graphing turned off.")
     
 
 # 1. Parses input file.
@@ -85,19 +85,20 @@ def main():
         return
 
     if PLOT_POSTER:
-        fig = plt.figure(figsize=(5,3.5))
+        plt.figure(figsize=(5,3.5))
         font = {#'family' : 'normal',
             #'weight' : 'bold',
             'size'   : 8}
-        matplotlib.rc('font', **font)
-        fig.subplots_adjust(top=0.94, bottom=0.14, left=0.1, right=0.96,wspace=0, hspace=0)
+        #matplotlib.rc('font', **font)
+        plt.subplots_adjust(top=0.94, bottom=0.14, left=0.15, right=0.96,wspace=0, hspace=0)
     else:
         fig = plt.figure(figsize=(9,5.5))
         fig.subplots_adjust(top=0.95, bottom=0.12, left=0.07, right=0.97,wspace=0, hspace=0)
     
-    p1 = fig.add_subplot(1,1,1)
+    #p1 = fig.add_subplot(1,1,1)
+    p1 = plt.subplot(111)
 
-    print "Plotting time..."
+    print("Plotting time...")
 
     sets = collections.OrderedDict()
 
@@ -110,16 +111,21 @@ def main():
             sets[thread] = [[data["totalTime"][i]],[data["runTime"][i]]]
 
     for key, value in sets.items():
+        print(value[0])
+        print(value[1])
         plot_label = 'Thread ' + key
         p1.plot(
-            value[0],
-            value[1],
+            [float(i) for i in value[0]],
+            [float(i) for i in value[1]],
             label= plot_label
         )
+
     plt.legend(loc='upper left')
     plt.ylabel("time to compute (ms)")
     plt.xlabel('Time (s)')
-    
+    #p1 = plt.axes()
+    #p1.xaxis.set_major_locator(plt.MaxNLocator(5))
+    #p1.yaxis.set_major_locator(plt.MaxNLocator(5))
  
     #ytick_range = [1,2,4,8,16,32,64,128,256] # in ns / iteration
     #ytick_names = ['1','2','4','8','16','32','64','128','256']
@@ -140,9 +146,10 @@ def main():
         filename = PLOT_DIR + os.path.basename(ccbench.PLOT_FILENAME)
         filename = os.path.splitext(filename)[0]
         
-    plt.savefig(filename)
-    print "Used report filename             : " + report_filename 
-    print "Finished Plotting, saved as file : " + filename + ".pdf"
+    plt.savefig(filename, format="pdf")
+    #plt.show()
+    print("Used report filename             : " + report_filename) 
+    print("Finished Plotting, saved as file : " + filename + ".pdf")
 
 
 
