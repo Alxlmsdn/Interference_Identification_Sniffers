@@ -35,7 +35,7 @@
 #include <stdint.h>
 #include <cctimer.h>
 #include <threadaffinity.h>
-#include "cclfsr.h"
+#include <cclfsr.h>
 #include <math.h>
 
 // Global Variables
@@ -67,8 +67,8 @@ int main(int argc, char* argv[])
 
    if (argc != 5) 
    {
-      fprintf(stderr, "argc=%d\n", argc);
-      fprintf(stderr, "\n[Usage]: cache_size <Number of Array Elements (Total)> <Number of Iterations> <MinRunTime> \n\n");
+      //fprintf(stderr, "argc=%d\n", argc);
+      fprintf(stderr, "\n[Usage]: <level> <Number of Array Elements (Total bytes)> <Number of Iterations> <MinRunTime> \n\n");
       return 1;
    }
    
@@ -105,6 +105,7 @@ int main(int argc, char* argv[])
          freeCPUSet(threads[i]->cpu_set);
          free(threads[i]);
       } 
+      fflush(stdout);
       free(threads); 
    }
    else {
