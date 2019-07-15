@@ -31,6 +31,7 @@
 double run_time;
 long write_size;
 pthread_mutex_t console_mutex;
+pthread_mutex_t file_mutex;
 
 void disk_bw_bm(void *);
 
@@ -45,6 +46,7 @@ int main(int argc, char* argv[]) {
     write_size = atoi(argv[2]);
 
     pthread_mutex_init(&console_mutex, NULL);
+    pthread_mutex_init(&file_mutex, NULL);
 
     int num_cores = sysconf(_SC_NPROCESSORS_CONF);
 
@@ -70,8 +72,9 @@ int main(int argc, char* argv[]) {
 
 void disk_bw_bm(void *tid) {
     uint32_t id = *(uint32_t *) tid;
-    char file_name[20];
-    sprintf(file_name, "thread_%d_file.txt", id);
+    char file_name[25];
+    int salt = rand() % 100;
+    sprintf(file_name, "thread_%d-%d_file.txt", id, salt);
     mode_t mode = S_IRWXU;
     struct stat stats;
     //opens file so program can read,write and program will block until data is written to disk
@@ -137,16 +140,19 @@ void disk_bw_bm(void *tid) {
         double stop_time = cc_get_seconds(0);
         elapsed_time += (stop_time - start_time);
         pthread_mutex_lock(&console_mutex);
-        fprintf(stdout, "thread:[%d], Bytes:[%lu], runTime(ms):[%f], totalTime:[%f]\n", id, length, 1e3 * (stop_time - start_time), elapsed_time);
+        fprintf(stdout, "thread:[%d], Bytes:[%lu], runTime(ms):[%f], totalTime:[%f]\n", id, length * sizeof(char), 1e3 * (stop_time - start_time), elapsed_time);
         pthread_mutex_unlock(&console_mutex);
     }
 
 #ifndef DEBUG
+    pthread_mutex_lock(&file_mutex);
+    //fprintf(stdout, "deleting %s\n", file_name);
     int status = remove(file_name);
     if (status != 0) {
         perror("Deleting file");
         pthread_exit((void *) 1);
     }
+    pthread_mutex_unlock(&file_mutex);
 #endif
     free(write_buffer);
     free(read_buffer);
