@@ -70,7 +70,7 @@ def parseIntArrayFromLine(line, str):
         
         else:
             fcn_idx = line.find("*")
-            if fcn_idx == -1: print "Unsupported Operator... let's pretend it's \"*\"..."
+            if fcn_idx == -1: print("Unsupported Operator... let's pretend it's \"*\"...")
             start_num   = int(line[0:colon_idx])
             end_num     = int(line[colon_idx+1:fcn_idx-1])
             inc_num     = int(line[fcn_idx+1:])
@@ -297,10 +297,10 @@ def runBenchmark(app_bin, app_args_list, report_filename):
                  
     for app_args in app_args_list:
         #architecture.runBenchmark(PROCESSOR, app_bin, app_args, report_filename)
-        print "" + app_bin + " " + app_args + " >> " + report_filename
+        print("" + app_bin + " " + app_args + " >> " + report_filename)
         value = runBash("" + app_bin + " " + app_args + " >> " + report_filename)
         if value != "": 
-            print value
+            print(value)
 
 
 
@@ -407,5 +407,5 @@ def getMostRecentReportFile(report_dir_path):
                 
 #This idiom means the below code only runs when executed from the command line
 if __name__ == '__main__':
-  print '--Error: ccbench.py is an include file--'
+  print('--Error: ccbench.py is an include file--')
 

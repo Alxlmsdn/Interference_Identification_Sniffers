@@ -2,8 +2,8 @@
 // Author: Alexander Lumsden 2019
 //      network_bw is the micro benchmark that is responsible for
 //      stressing the outgoing network bandwidth of the system.
-//      The bm will use a two programs, one will be responisble 
-//      for sending a random message to a recieving network sink 
+//      The bm will use a two programs, one will be responsible
+//      for sending a random message to a receiving network sink
 //      program hosted on another system (not the target) the
 //      throughput in MB/s will be measured. 
 //
@@ -29,5 +29,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Usage: <url/IP> <port> <messageSize>\n");
         return -1;
     }
+
+
 
 }
