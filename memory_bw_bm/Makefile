@@ -1,6 +1,6 @@
 TARGET=memory_bw
-SOURCES:=memory_bw.c ../common/cctimer.c ../common/threadaffinity.c
-DEPS := ../common/cctimer.h ../common/thread/affinity.h
+SOURCES:=memory_bw.c ../common/cctimer.c ../common/threadaffinity.c ../common/cclfsr.c
+DEPS := ../common/cctimer.h ../common/threadaffinity.h ../common/cclfsr.h
 
 OBJECTS ?= $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(SOURCES) ) ) )
 

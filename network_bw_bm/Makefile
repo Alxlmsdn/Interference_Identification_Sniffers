@@ -1,5 +1,5 @@
-TARGET=network_bm
-SOURCES:=network_bm.c ../common/cctimer.c ../common/threadaffinity.c
+TARGET=network_bw
+SOURCES:=network_bw.c ../common/cctimer.c ../common/threadaffinity.c
 DEPS := ../common/cctimer.h ../common/thread/affinity.h
 
 OBJECTS ?= $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(SOURCES) ) ) )
@@ -20,6 +20,9 @@ $(TARGET): $(OBJECTS)
 	#fi
 	$(CC) $(CFLAGS) $^ -o $@ $(LD_LIBS)
 
+networkSink: networkSink.o
+	$(CC) $(CFLAGS) $^ -o $@ $(LD_LIBS)
+
 .PHONY: clean
 clean:
-	-rm -f *.o *.d *.pyc ../common/*.o $(TARGET)
+	-rm -f *.o *.d *.pyc ../common/*.o $(TARGET) networkSink

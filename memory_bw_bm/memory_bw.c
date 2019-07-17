@@ -20,6 +20,7 @@
 #include <cctimer.h>
 #include <threadaffinity.h>
 #include <pthread.h>
+#include <cclfsr.h>
 
 //#define DEBUG
 
@@ -29,6 +30,7 @@ void memory_bw_bm(void *);
 
 static uint32_t iterations;
 static uint32_t array_size;
+static long page_size;
 static double average_times[4] = {0};
 static double num_bytes[4];
 pthread_mutex_t console_mutex;
@@ -51,7 +53,19 @@ int main(int argc, char* argv[]) {
     num_bytes[3] = 3 * sizeof(STREAM_ELEMENTS) * array_size;
 
     int num_cores = sysconf(_SC_NPROCESSORS_CONF);
+    page_size = sysconf(_SC_PAGE_SIZE);
 
+    /*cc_lfsr_t lfsr;
+    cc_lfsr_init(&lfsr, 1, 12);
+    int num_pages = array_size/page_size;
+    for (int i = 0; i < 100; i++) {
+        //fprintf(stdout, "%d\n", lfsr.value);
+        int j = page_size * (lfsr.value % num_pages);
+        lfsr.value = cc_lfsr_next(&lfsr) * page_size;
+        int i = (rand() % num_pages) * page_size;
+        fprintf(stdout, "%d : %d\n", i,j);
+    }
+    return 0;*/
     cpu_thread_t** threads = setThreads(memory_bw_bm, num_cores);
 
 #ifdef DEBUG
@@ -77,16 +91,23 @@ int main(int argc, char* argv[]) {
 void memory_bw_bm(void* tid) {
     uint32_t id = *(uint32_t*) tid;
     //fprintf(stdout, "done %d\n", id);
+    cc_lfsr_t lfsr;
+    cc_lfsr_init(&lfsr, 2, 7);
+    int num_pages = array_size/page_size;
+
     STREAM_ELEMENTS times[5][iterations];
     double elapsed_times[5][iterations];
     STREAM_ELEMENTS *a, *b, *c;
+    int *d;
     a = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
     b = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
     c = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
+    d = (int *) malloc(sizeof(int) * array_size);
     for (uint32_t i = 0; i < array_size; i++) {
         a[i] = 2.0;
         b[i] = 2.0;
         c[i] = 0.0;
+        d[i] = (rand() % num_pages) * page_size;
     }
     double elapsed_time = 0;
     double scalar = 3.0;
@@ -94,28 +115,28 @@ void memory_bw_bm(void* tid) {
         times[0][n] = cc_get_seconds(0);
         times[4][n] = times[0][n];
         for (uint32_t i = 0; i < array_size; i++) {
-            c[i] = a[i];
+            c[d[i]] = a[d[i]];
         }
         times[0][n] = cc_get_seconds(0) - times[0][n];
 
 
         times[1][n] = cc_get_seconds(0);
         for (uint32_t i = 0; i < array_size; i++) {
-            b[i] = scalar*c[i];
+            b[d[i]] = scalar*c[d[i]];
         }
         times[1][n] = cc_get_seconds(0) - times[1][n];
 
 
         times[2][n] = cc_get_seconds(0);
         for (uint32_t i = 0; i < array_size; i++) {
-            c[i] = a[i]+b[i];
+            c[d[i]] = a[d[i]]+b[d[i]];
         }
         times[2][n] = cc_get_seconds(0) - times[2][n];
 
 
         times[3][n] = cc_get_seconds(0);
         for (uint32_t i = 0; i < array_size; i++) {
-            a[i] = b[i]+scalar*c[i];
+            a[d[i]] = b[d[i]]+scalar*c[d[i]];
         }
         times[4][n] = cc_get_seconds(0) - times[4][n];
         times[3][n] = cc_get_seconds(0) - times[3][n];
@@ -128,4 +149,5 @@ void memory_bw_bm(void* tid) {
     free(a);
     free(b);
     free(c);
+    free(d);
 }
