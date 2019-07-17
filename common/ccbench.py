@@ -145,6 +145,8 @@ def controller():
     global MIN_RUN_TIME
     global THREADS
     global SIZE
+    global IP
+    global PORT
     
     #create instance of Option Parser Module, included in Standard Library
     p = optparse.OptionParser(description='CLI Controller for memory system u-kernels',
@@ -195,7 +197,13 @@ def controller():
                   default = "1") 
     p.add_option('--size', '-s', dest = 'size',
                   help='size of array in elements',
-                  default= "10000000")           
+                  default= "10000000")   
+    p.add_option('--ip', dest = 'ip',
+                  help='ip address to connect to',
+                  default= "127.0.0.1")
+    p.add_option('--port', dest = 'port',
+                  help='port number',
+                  default= "5555")        
 
     #option Handling passes correct parameter to runBash 
     options, arguments = p.parse_args()
@@ -214,6 +222,8 @@ def controller():
     MIN_RUN_TIME   = options.minRunTime
     THREADS        = options.numThreads
     SIZE           = options.size
+    IP             = options.ip
+    PORT           = options.port
 
 
 # 1. Parse inputs file
