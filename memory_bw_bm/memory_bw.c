@@ -55,17 +55,6 @@ int main(int argc, char* argv[]) {
     int num_cores = sysconf(_SC_NPROCESSORS_CONF);
     page_size = sysconf(_SC_PAGE_SIZE);
 
-    /*cc_lfsr_t lfsr;
-    cc_lfsr_init(&lfsr, 1, 12);
-    int num_pages = array_size/page_size;
-    for (int i = 0; i < 100; i++) {
-        //fprintf(stdout, "%d\n", lfsr.value);
-        int j = page_size * (lfsr.value % num_pages);
-        lfsr.value = cc_lfsr_next(&lfsr) * page_size;
-        int i = (rand() % num_pages) * page_size;
-        fprintf(stdout, "%d : %d\n", i,j);
-    }
-    return 0;*/
     cpu_thread_t** threads = setThreads(memory_bw_bm, num_cores);
 
 #ifdef DEBUG
