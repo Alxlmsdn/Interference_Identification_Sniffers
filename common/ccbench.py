@@ -70,7 +70,7 @@ def parseIntArrayFromLine(line, str):
         
         else:
             fcn_idx = line.find("*")
-            if fcn_idx == -1: print "Unsupported Operator... let's pretend it's \"*\"..."
+            if fcn_idx == -1: print("Unsupported Operator... let's pretend it's \"*\"...")
             start_num   = int(line[0:colon_idx])
             end_num     = int(line[colon_idx+1:fcn_idx-1])
             inc_num     = int(line[fcn_idx+1:])
@@ -145,6 +145,8 @@ def controller():
     global MIN_RUN_TIME
     global THREADS
     global SIZE
+    global IP
+    global PORT
     
     #create instance of Option Parser Module, included in Standard Library
     p = optparse.OptionParser(description='CLI Controller for memory system u-kernels',
@@ -195,7 +197,13 @@ def controller():
                   default = "1") 
     p.add_option('--size', '-s', dest = 'size',
                   help='size of array in elements',
-                  default= "10000000")           
+                  default= "10000000")   
+    p.add_option('--ip', dest = 'ip',
+                  help='ip address to connect to',
+                  default= "127.0.0.1")
+    p.add_option('--port', dest = 'port',
+                  help='port number',
+                  default= "5555")        
 
     #option Handling passes correct parameter to runBash 
     options, arguments = p.parse_args()
@@ -214,6 +222,8 @@ def controller():
     MIN_RUN_TIME   = options.minRunTime
     THREADS        = options.numThreads
     SIZE           = options.size
+    IP             = options.ip
+    PORT           = options.port
 
 
 # 1. Parse inputs file
@@ -297,10 +307,10 @@ def runBenchmark(app_bin, app_args_list, report_filename):
                  
     for app_args in app_args_list:
         #architecture.runBenchmark(PROCESSOR, app_bin, app_args, report_filename)
-        print "" + app_bin + " " + app_args + " >> " + report_filename
+        print("" + app_bin + " " + app_args + " >> " + report_filename)
         value = runBash("" + app_bin + " " + app_args + " >> " + report_filename)
         if value != "": 
-            print value
+            print(value)
 
 
 
@@ -407,5 +417,5 @@ def getMostRecentReportFile(report_dir_path):
                 
 #This idiom means the below code only runs when executed from the command line
 if __name__ == '__main__':
-  print '--Error: ccbench.py is an include file--'
+  print('--Error: ccbench.py is an include file--')
 
