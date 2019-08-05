@@ -68,6 +68,8 @@ def main():
         # Build up the arguments list for each invocation of the benchmark.
         # This is done here, instead of in ccbench.py, because this is custom to each app.
         app_args_list = []
+        if (ccbench.CONFIG != 'none'):
+            ccbench.parseConfigFile(APP)
         #for i in range(int(ccbench.THREADS)):
         app_args_list.append(ccbench.THREADS + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
         #print(app_args_list)
@@ -111,8 +113,8 @@ def main():
             sets[thread] = [[data["totalTime"][i]],[data["runTime"][i]]]
 
     for key, value in sets.items():
-        print(value[0])
-        print(value[1])
+        #print(value[0])
+        #print(value[1])
         plot_label = 'Thread ' + key
         p1.plot(
             [float(i) for i in value[0]],
