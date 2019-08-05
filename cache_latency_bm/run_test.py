@@ -24,8 +24,8 @@ import ccbench
 
 APP = "caches"
 BASE_DIR="./"
-REPORT_DIR=BASE_DIR + "Reports/"
-PLOT_DIR=BASE_DIR + "Plots/"
+REPORT_DIR="../Reports/"
+PLOT_DIR="../Plots/"
 DEFAULT_REPORT_NAME = "report.txt"
 
 variables = (

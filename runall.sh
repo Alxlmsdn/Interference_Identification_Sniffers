@@ -56,7 +56,7 @@ then
       echo "*****************************************************************"
       echo " "
       echo $@
-      cd $test; make clean; make && ./run_test.py -c ../configFile.txt; cd ..;
+      cd $test; make clean; make && ./run_test.py -c ../configFile.txt; make clean; cd ..;
       echo " "
    done
 

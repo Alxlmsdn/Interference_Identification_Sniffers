@@ -24,8 +24,7 @@ import ccbench
 
 APP = "memory_bw"
 BASE_DIR="./"
-REPORT_DIR=BASE_DIR + "Reports/"
-PLOT_DIR=BASE_DIR + "Plots/"
+REPORT_DI="../Plots/"
 DEFAULT_REPORT_NAME = "report.txt"
 
 variables = (

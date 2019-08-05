@@ -1,6 +1,8 @@
 #config file for tests
 
-cpu --numThreads 3 -i 10000987 -t 10
+#10000987
+cpu --numThreads 3 -i 20001001 -t 10
 disk_bw -t 10 -s 0
 memory_bw -s 10000000 -i 10
+icache -s 10000000 -t 5
 
