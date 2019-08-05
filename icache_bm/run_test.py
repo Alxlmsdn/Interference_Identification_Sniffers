@@ -22,7 +22,7 @@ import collections
 import ccbench      
 #import ccprocstats
 
-APP = "network_bw"
+APP = "icache"
 BASE_DIR="./"
 REPORT_DIR=BASE_DIR + "Reports/"
 PLOT_DIR=BASE_DIR + "Plots/"
@@ -31,7 +31,7 @@ DEFAULT_REPORT_NAME = "report.txt"
 variables = (
     "thread",
     "totalTime",
-    "rate"
+    "runTime"
     )
  
 # Sometimes we run on remote platforms without access to matplotlib.  In this
@@ -72,7 +72,7 @@ def main():
             ccbench.parseConfigFile(APP)
             
         #for i in range(int(ccbench.THREADS)):
-        app_args_list.append(ccbench.IP + " " + ccbench.PORT + " " + ccbench.SIZE + " " + ccbench.MIN_RUN_TIME)
+        app_args_list.append(ccbench.SIZE + " " + ccbench.MIN_RUN_TIME)
         #print(app_args_list)
 
     # 2. Execute the benchmark and write to the report file.
@@ -108,9 +108,9 @@ def main():
         thread = data["thread"][i]
         if thread in sets:
             sets[thread][0].append(data["totalTime"][i])
-            sets[thread][1].append(data["rate"][i])
+            sets[thread][1].append(data["runTime"][i])
         else:
-            sets[thread] = [[data["totalTime"][i]],[data["rate"][i]]]
+            sets[thread] = [[data["totalTime"][i]],[data["runTime"][i]]]
 
     for key, value in sets.items():
         plot_label = 'Thread ' + key
@@ -120,7 +120,7 @@ def main():
             label= plot_label
         )
     plt.legend(loc='upper left')
-    plt.ylabel("rate (MB/s)")
+    plt.ylabel("time to compute (ms)")
     plt.xlabel('Time (s)')
     
  
@@ -130,7 +130,7 @@ def main():
     #p1.yaxis.set_major_locator( plt.NullLocator() )
     #p1.yaxis.set_minor_locator( plt.NullLocator() )
     #plt.yticks(ytick_range,ytick_names)
-    
+    p1.set_ylim(bottom=0)
 
     if (ccbench.PLOT_FILENAME == "none"):
         filename = PLOT_DIR + ccbench.generatePlotFileName(APP)
@@ -144,7 +144,7 @@ def main():
         filename = os.path.splitext(filename)[0]
         
     plt.savefig(filename)
-    print( "Used report filename             : " + report_filename)
+    print("Used report filename             : " + report_filename)
     print("Finished Plotting, saved as file : " + filename + ".pdf")
 
 

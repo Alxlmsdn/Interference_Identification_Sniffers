@@ -125,7 +125,7 @@ def arrayToStr(array):
 
  
 #Function to control option parsing in Python
-def controller():
+def controller(args=None):
     global VERBOSE
     global NORUN
     global INPUT_TYPE
@@ -147,6 +147,7 @@ def controller():
     global SIZE
     global IP
     global PORT
+    global CONFIG
     
     #create instance of Option Parser Module, included in Standard Library
     p = optparse.OptionParser(description='CLI Controller for memory system u-kernels',
@@ -203,10 +204,16 @@ def controller():
                   default= "127.0.0.1")
     p.add_option('--port', dest = 'port',
                   help='port number',
-                  default= "5555")        
+                  default= "5555") 
+    p.add_option('--configFile', '-c', dest = 'config',
+                  help='input config file',
+                  default= "none") 
 
     #option Handling passes correct parameter to runBash 
-    options, arguments = p.parse_args()
+    if (args == None):
+        options, arguments = p.parse_args() 
+    else:
+        options, arguments = p.parse_args(args=args)
     NORUN          = options.norun
     #INPUT_TYPE     = options.input_type
     REPORT_FILENAME= options.reportfilename
@@ -224,6 +231,27 @@ def controller():
     SIZE           = options.size
     IP             = options.ip
     PORT           = options.port
+    CONFIG         = options.config
+
+def parseConfigFile(app):
+    input_file = open(CONFIG).readlines() 
+
+    input_finished = False
+
+    for line in input_file:
+
+        if input_finished:
+            continue
+
+        idx = (line.strip()).find("#")
+        if idx == 0:
+            continue
+
+        if (app in line):
+            params = line.split()
+            controller(params[1:])
+            input_finished = True
+    return
 
 
 # 1. Parse inputs file

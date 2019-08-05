@@ -69,7 +69,9 @@ def main():
         # Build up the arguments list for each invocation of the benchmark.
         # This is done here, instead of in ccbench.py, because this is custom to each app.
         app_args_list = []
-
+        if (ccbench.CONFIG != 'none'):
+            ccbench.parseConfigFile(APP)
+            
         if (ccbench.LEVEL1 != "0"):
             app_args_list.append("L1 " + ccbench.LEVEL1 + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
         if (ccbench.LEVEL2 != "0"):
