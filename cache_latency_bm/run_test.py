@@ -58,7 +58,6 @@ except:
 def main():
     # handle CLI options
     ccbench.controller()  
-    NOPLOT = ccbench.NOPLOT
     #handle default/cli args app
     app_bin = BASE_DIR + APP
     #input_filename = BASE_DIR +  DEFAULT_INPUT_NAME
@@ -90,7 +89,7 @@ def main():
     
     # 4. Plot the Data
     #print data
-    if (not NOPLOT):
+    if (not ccbench.NOPLOT):
         if PLOT_POSTER:
             fig = plt.figure(figsize=(5,3.5))
             font = {#'family' : 'normal',
@@ -107,7 +106,7 @@ def main():
         print("Plotting time...")
 
     sets = collections.OrderedDict()
-    if  (NOPLOT):
+    if  (ccbench.NOPLOT):
         csv_file = open(report_csv_filename, "a+")
         header = "totalTime"
         data_list = []
@@ -127,7 +126,7 @@ def main():
     for level, threads in sets.items():
         columns = len(sets) * len(threads)
         for thread, times in threads.items():
-            if (NOPLOT):
+            if (ccbench.NOPLOT):
                 header += ",{}_{}".format(level, thread)
                 for i in range(len(times[0])):
                     data_list.append(times[0][i] + "," + (","*commas) + times[1][i] + ("," *(columns-1 - commas))+"\n")
@@ -139,10 +138,11 @@ def main():
                     [float(i) for i in times[1]],
                     label= plot_label
                 )
-    if (NOPLOT):
+    if (ccbench.NOPLOT):
         csv_file.write(header+"\n")
         csv_file.writelines(data_list)
         csv_file.close()
+        print("Saved data in CSV -> " + report_csv_filename)
     else:            
         plt.legend(loc='upper left')
 

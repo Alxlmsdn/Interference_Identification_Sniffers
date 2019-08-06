@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     runTime = atof(argv[2]);
     size = atoi(argv[1]);
 
-    int num_cores = 1;
+    int num_cores = sysconf(_SC_NPROCESSORS_CONF);
 
     cpu_thread_t** threads = setThreads(icache, num_cores);
 

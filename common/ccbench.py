@@ -172,7 +172,7 @@ def controller(args=None):
     p.add_option('--reportfilename','-r', dest="reportfilename",
                   help='Filename to use for the report file. Data from runs are stored in this file. Also, plots are generated from the data in this file. The file is always placed in the \'reports\' directory. If the directory name is provided as part of the \'reportfilename\', it will be automatically stripped out (allows you to easily specify the existing report you want to use).',
                   default = "none")
-    p.add_option('--noplot','-g', action="store_true",
+    p.add_option('--noplot','-g', dest="noplot", action="store_true",
                   help='Skips plotting ukernels (runs ukernels and saves to results.txt file).',
                   default = False)
     p.add_option('--verbose', '-v', action = 'store_true',

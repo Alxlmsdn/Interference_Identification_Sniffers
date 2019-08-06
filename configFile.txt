@@ -4,5 +4,5 @@
 cpu --numThreads 3 -i 20001001 -t 10 --noplot
 disk_bw -t 10 -s 0  --noplot
 memory_bw -s 10000000 -i 10 --noplot
-icache -s 1000000 -t 5  --noplot
-caches -1 32768 -2 3145728 -i 37108864 -t 10 --noplot
+icache -s 100000 -t 10  --noplot
+caches -1 32768 -2 3145728 -i 3710886 -t 10 --noplot

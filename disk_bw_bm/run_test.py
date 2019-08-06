@@ -55,7 +55,6 @@ except:
 # 3. Parses results file for data (can also play back recording using NORUN option).
 # 4. Graphs results and outputs to .pdf file.
 def main():
-    NOPLOT = False
     # handle CLI options
     ccbench.controller()  
 
@@ -75,8 +74,6 @@ def main():
         #for i in range(int(ccbench.THREADS)):
         app_args_list.append(ccbench.MIN_RUN_TIME + " " + ccbench.SIZE)
         #print(app_args_list)
-        if (ccbench.NOPLOT):
-            NOPLOT = True
 
     # 2. Execute the benchmark and write to the report file.
     if (not ccbench.NORUN):
@@ -87,7 +84,7 @@ def main():
     
     # 4. Plot the Data
     #print data
-    if(not NOPLOT):
+    if(not ccbench.NOPLOT):
         if PLOT_POSTER:
             fig = plt.figure(figsize=(5,3.5))
             font = {#'family' : 'normal',
@@ -104,7 +101,7 @@ def main():
         print("Plotting time...")
 
     sets = collections.OrderedDict()
-    if  (NOPLOT):
+    if  (ccbench.NOPLOT):
         csv_file = open(report_csv_filename, "a+")
         header = "totalTime"
         data_list = []
@@ -118,7 +115,7 @@ def main():
             sets[thread] = [[data["totalTime"][i]],[data["runTime"][i]]]
 
     for key, value in sets.items():
-        if  (NOPLOT):
+        if  (ccbench.NOPLOT):
             header += ",{}".format(key)
             for i in range(len(value[0])):
                 data_list.append(value[0][i] + "," + (","*int(key)) + value[1][i] + ("," *(len(sets)-1 - int(key)))+"\n")
@@ -130,10 +127,11 @@ def main():
                 label= plot_label
             )
     
-    if (NOPLOT):
+    if (ccbench.NOPLOT):
         csv_file.write(header+"\n")
         csv_file.writelines(data_list)
         csv_file.close()
+        print("Saved data in CSV -> " + report_csv_filename)
     else:
         plt.legend(loc='upper left')
         plt.ylabel("time to compute (ms)")

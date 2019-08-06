@@ -62,7 +62,7 @@ def main():
     app_bin = BASE_DIR + APP
     #input_filename = BASE_DIR +  DEFAULT_INPUT_NAME
     report_filename = REPORT_DIR + ccbench.getReportFileName(APP, REPORT_DIR)   
-   
+    report_csv_filename = REPORT_DIR + ccbench.getReportFileName(APP, REPORT_DIR, ".csv")
     # 1. Parse inputs.txt file.
     if (not ccbench.NORUN):
         # Build up the arguments list for each invocation of the benchmark.
@@ -84,25 +84,28 @@ def main():
     
     # 4. Plot the Data
     #print data
-    if NOPLOT:
-        return
+    if (not ccbench.NOPLOT):
+        if PLOT_POSTER:
+            fig = plt.figure(figsize=(5,3.5))
+            font = {#'family' : 'normal',
+                #'weight' : 'bold',
+                'size'   : 8}
+            matplotlib.rc('font', **font)
+            fig.subplots_adjust(top=0.94, bottom=0.14, left=0.1, right=0.96,wspace=0, hspace=0)
+        else:
+            fig = plt.figure(figsize=(9,5.5))
+            fig.subplots_adjust(top=0.95, bottom=0.12, left=0.07, right=0.97,wspace=0, hspace=0)
+        
+        p1 = fig.add_subplot(1,1,1)
 
-    if PLOT_POSTER:
-        fig = plt.figure(figsize=(5,3.5))
-        font = {#'family' : 'normal',
-            #'weight' : 'bold',
-            'size'   : 8}
-        matplotlib.rc('font', **font)
-        fig.subplots_adjust(top=0.94, bottom=0.14, left=0.1, right=0.96,wspace=0, hspace=0)
-    else:
-        fig = plt.figure(figsize=(9,5.5))
-        fig.subplots_adjust(top=0.95, bottom=0.12, left=0.07, right=0.97,wspace=0, hspace=0)
-    
-    p1 = fig.add_subplot(1,1,1)
-
-    print("Plotting time...")
+        print("Plotting time...")
 
     sets = collections.OrderedDict()
+
+    if  (ccbench.NOPLOT):
+        csv_file = open(report_csv_filename, "a+")
+        header = "totalTime"
+        data_list = []
 
     for i in range(len(data["thread"])):
         thread = data["thread"][i]
@@ -113,39 +116,50 @@ def main():
             sets[thread] = [[data["totalTime"][i]],[data["rate"][i]]]
 
     for key, value in sets.items():
-        plot_label = 'Thread ' + key
-        p1.plot(
-            [float(i) for i in value[0]],
-            [float(i) for i in value[1]],
-            label= plot_label
-        )
-    plt.legend(loc='upper left')
-    plt.ylabel("rate (MB/s)")
-    plt.xlabel('Time (s)')
-    
- 
-    #ytick_range = [1,2,4,8,16,32,64,128,256] # in ns / iteration
-    #ytick_names = ['1','2','4','8','16','32','64','128','256']
-    
-    #p1.yaxis.set_major_locator( plt.NullLocator() )
-    #p1.yaxis.set_minor_locator( plt.NullLocator() )
-    #plt.yticks(ytick_range,ytick_names)
-    
-
-    if (ccbench.PLOT_FILENAME == "none"):
-        filename = PLOT_DIR + ccbench.generatePlotFileName(APP)
+        if (ccbench.NOPLOT):
+            header += ",{}".format(key)
+            for i in range(len(value[0])):
+                data_list.append(value[0][i] + "," + (","*int(key)) + value[1][i] + ("," *(len(sets)-1 - int(key)))+"\n")
+        else:
+            plot_label = 'Thread ' + key
+            p1.plot(
+                [float(i) for i in value[0]],
+                [float(i) for i in value[1]],
+                label= plot_label
+            )
+    if (ccbench.NOPLOT):
+        csv_file.write(header+"\n")
+        csv_file.writelines(data_list)
+        csv_file.close()
+        print("Saved data in CSV -> " + report_csv_filename)
     else:
-        # Pull out the filename path from the full path.
-        # This allows us to pull out the requested filename from the path presented
-        # (since we always write reports to the report directory, etc.). However, it
-        # allows the user to use tab-completion to specify the exact reportfile he
-        # wants to use.
-        filename = PLOT_DIR + os.path.basename(ccbench.PLOT_FILENAME)
-        filename = os.path.splitext(filename)[0]
+        plt.legend(loc='upper left')
+        plt.ylabel("rate (MB/s)")
+        plt.xlabel('Time (s)')
         
-    plt.savefig(filename)
-    print( "Used report filename             : " + report_filename)
-    print("Finished Plotting, saved as file : " + filename + ".pdf")
+    
+        #ytick_range = [1,2,4,8,16,32,64,128,256] # in ns / iteration
+        #ytick_names = ['1','2','4','8','16','32','64','128','256']
+        
+        #p1.yaxis.set_major_locator( plt.NullLocator() )
+        #p1.yaxis.set_minor_locator( plt.NullLocator() )
+        #plt.yticks(ytick_range,ytick_names)
+        
+
+        if (ccbench.PLOT_FILENAME == "none"):
+            filename = PLOT_DIR + ccbench.generatePlotFileName(APP)
+        else:
+            # Pull out the filename path from the full path.
+            # This allows us to pull out the requested filename from the path presented
+            # (since we always write reports to the report directory, etc.). However, it
+            # allows the user to use tab-completion to specify the exact reportfile he
+            # wants to use.
+            filename = PLOT_DIR + os.path.basename(ccbench.PLOT_FILENAME)
+            filename = os.path.splitext(filename)[0]
+            
+        plt.savefig(filename)
+        print( "Used report filename             : " + report_filename)
+        print("Finished Plotting, saved as file : " + filename + ".pdf")
 
 
 
