@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 # "runall.sh" script runs through all $TESTS, either on local machine if RUN_LOCAL=1, or on
 # a list of remote machines otherwise. 
 
@@ -56,7 +56,7 @@ then
       echo "*****************************************************************"
       echo " "
       echo $@
-      cd $test; make clean; make && ./run_test.py -c ../configFile.txt; make clean; cd ..;
+      cd $test; make clean; make && python3 run_test.py -c ../configFile.txt; make clean; cd ..;
       echo " "
    done
 
