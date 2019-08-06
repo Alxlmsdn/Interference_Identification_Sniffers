@@ -55,6 +55,7 @@ except:
 # 3. Parses results file for data (can also play back recording using NORUN option).
 # 4. Graphs results and outputs to .pdf file.
 def main():
+    NOPLOT = False
     # handle CLI options
     ccbench.controller()  
 
@@ -62,7 +63,7 @@ def main():
     app_bin = BASE_DIR + APP
     #input_filename = BASE_DIR +  DEFAULT_INPUT_NAME
     report_filename = REPORT_DIR + ccbench.getReportFileName(APP, REPORT_DIR)   
-    report_csv_filename = REPORT_DIR + ccbench.getReportFileName(APP, REPORT_DIR) + ".csv"
+    report_csv_filename = REPORT_DIR + ccbench.getReportFileName(APP, REPORT_DIR, ".csv")
     # 1. Parse inputs.txt file.
     if (not ccbench.NORUN):
         # Build up the arguments list for each invocation of the benchmark.
@@ -73,6 +74,8 @@ def main():
         #for i in range(int(ccbench.THREADS)):
         app_args_list.append(ccbench.THREADS + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
         #print(app_args_list)
+        if (ccbench.NOPLOT):
+            NOPLOT = True
 
     # 2. Execute the benchmark and write to the report file.
     if (not ccbench.NORUN):

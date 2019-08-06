@@ -406,24 +406,24 @@ def parseReportFileForInputs(report_filename, input_variables):
 
     return inputs
 
-def getReportFileName(app_str, report_dir_path):
+def getReportFileName(app_str, report_dir_path, file_type=".txt"):
     if (REPORT_FILENAME == "none"):
         if (NORUN):
             # if norun, plot using the lastest report_filename 
                 report_filename = \
                     getMostRecentReportFile("/" + app_str + "/" + report_dir_path)
         else:   
-            report_filename = generateReportFileName(app_str)
+            report_filename = generateReportFileName(app_str, file_type)
     else:   
         report_filename = os.path.basename(REPORT_FILENAME)
     return report_filename
 
 
-def generateReportFileName(app_str):
+def generateReportFileName(app_str, file_type):
     t = datetime.now()
     #time_str = t.strftime("%Y-%m-%d %H:%M:%S")
     time_str = t.strftime("%Y-%m-%d_%Hh%Mm%Ss")
-    return "reportfile_" + app_str + "_" + PROCESSOR + "_" + time_str + ".txt"
+    return "reportfile_" + app_str + "_" + PROCESSOR + "_" + time_str + file_type
 
 def generatePlotFileName(app_str):
     t = datetime.now()
