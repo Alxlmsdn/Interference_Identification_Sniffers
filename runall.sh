@@ -20,7 +20,7 @@ RUN_LOCAL=1
 
 # Which tests and input sizes do we want to use?
 #TESTS=(caches band_req band_req_mc cache2cache mem_interleaving)
-TESTS=(cache_latency_bm cpu_bm disk_bw_bm icache_bm memory_bw_bm)
+TESTS=(network_bw_bm cache_latency_bm cpu_bm disk_bw_bm icache_bm memory_bw_bm)
 INPUTSIZE="small"
 # if you're running riscv, you'll want much shorter input vectors!
 #INPUTSIZE="riscv"
@@ -56,6 +56,8 @@ then
       echo "*****************************************************************"
       echo " "
       echo $@
+      #for K8's test--------------------------------
+      #cd $test; make clean; make && python3 run_test.py -c /data/config/configFile.txt; make clean; cd ..;
       cd $test; make clean; make && python3 run_test.py -c ../configFile.txt; make clean; cd ..;
       echo " "
    done

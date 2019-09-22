@@ -25,6 +25,8 @@ import ccbench
 APP = "cpu"
 BASE_DIR="./"
 REPORT_DIR="../Reports/"
+#for k8's testing-----------
+#REPORT_DIR="/data/Reports/"
 PLOT_DIR="../Plots/"
 DEFAULT_REPORT_NAME = "report.txt"
 

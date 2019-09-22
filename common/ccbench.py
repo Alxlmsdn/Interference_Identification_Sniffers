@@ -148,7 +148,8 @@ def controller(args=None):
     global IP
     global PORT
     global CONFIG
-    
+    global FILE_PATH
+
     #create instance of Option Parser Module, included in Standard Library
     p = optparse.OptionParser(description='CLI Controller for memory system u-kernels',
                   prog='./run_test.py',
@@ -208,6 +209,9 @@ def controller(args=None):
     p.add_option('--configFile', '-c', dest = 'config',
                   help='input config file',
                   default= "none") 
+    p.add_option('--file_path', dest = 'file_path',
+                  help='where the temp files should be written',
+                  default= "") 
 
     #option Handling passes correct parameter to runBash 
     if (args == None):
@@ -232,6 +236,7 @@ def controller(args=None):
     IP             = options.ip
     PORT           = options.port
     CONFIG         = options.config
+    FILE_PATH      = options.file_path
 
 def parseConfigFile(app):
     input_file = open(CONFIG).readlines() 

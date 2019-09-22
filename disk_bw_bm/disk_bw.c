@@ -30,6 +30,7 @@
 
 double run_time;
 long write_size;
+char* write_path;
 pthread_mutex_t console_mutex;
 pthread_mutex_t file_mutex;
 
@@ -37,13 +38,20 @@ void disk_bw_bm(void *);
 
 int main(int argc, char* argv[]) {
 
-    if (argc != 3) {
-        fprintf(stdout, "Usage: <runTime> <write size>\n");
+    if (argc != 3 && argc != 4) {
+        fprintf(stdout, "Usage: <runTime> <write size> <writePath>\n");
         return 1;
     }
 
     run_time = atof(argv[1]);
     write_size = atoi(argv[2]);
+
+    if (argc == 4) {
+        write_path = argv[3];
+    }
+    else{
+        write_path = "";
+    }
 
     pthread_mutex_init(&console_mutex, NULL);
     pthread_mutex_init(&file_mutex, NULL);
@@ -75,10 +83,14 @@ void disk_bw_bm(void *tid) {
     char file_name[25];
     int salt = rand() % 100;
     sprintf(file_name, "thread_%d-%d_file.txt", id, salt);
+    char* file_path = (char*) malloc(strlen(write_path) + strlen(file_name) + 1);
+    strcpy(file_path, write_path);
+    strcat(file_path, file_name);
+
     mode_t mode = S_IRWXU;
     struct stat stats;
     //opens file so program can read,write and program will block until data is written to disk
-    int fd = open(file_name, O_RDWR | O_CREAT | O_SYNC, mode);
+    int fd = open(file_path, O_RDWR | O_CREAT | O_SYNC, mode);
     if (fd == -1) {
         fprintf(stdout, "Error opening %s\n", file_name); 
         pthread_exit((void *) 1);
@@ -145,9 +157,13 @@ void disk_bw_bm(void *tid) {
     }
 
 #ifndef DEBUG
+    if(close(fd) == -1) {
+        perror("closing file");
+        pthread_exit((void *) 1);
+    }
     pthread_mutex_lock(&file_mutex);
     //fprintf(stdout, "deleting %s\n", file_name);
-    int status = remove(file_name);
+    int status = remove(file_path);
     if (status != 0) {
         perror("Deleting file");
         pthread_exit((void *) 1);
@@ -156,4 +172,5 @@ void disk_bw_bm(void *tid) {
 #endif
     free(write_buffer);
     free(read_buffer);
+    free(file_path);
 }

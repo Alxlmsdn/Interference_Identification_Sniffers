@@ -25,6 +25,8 @@ import ccbench
 APP = "disk_bw"
 BASE_DIR="./"
 REPORT_DIR="../Reports/"
+#for K8's testing
+#REPORT_DIR="/data/Reports/"
 PLOT_DIR="../Plots/"
 DEFAULT_REPORT_NAME = "report.txt"
 
@@ -72,7 +74,7 @@ def main():
             ccbench.parseConfigFile(APP)
             
         #for i in range(int(ccbench.THREADS)):
-        app_args_list.append(ccbench.MIN_RUN_TIME + " " + ccbench.SIZE)
+        app_args_list.append(ccbench.MIN_RUN_TIME + " " + ccbench.SIZE + " " + ccbench.FILE_PATH))
         #print(app_args_list)
 
     # 2. Execute the benchmark and write to the report file.

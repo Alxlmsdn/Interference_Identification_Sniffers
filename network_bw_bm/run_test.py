@@ -25,6 +25,8 @@ import ccbench
 APP = "network_bw"
 BASE_DIR="./"
 REPORT_DIR= "../Reports/"
+#for K8's testing-----------
+#REPORT_DIR= "/data/Reports/"
 PLOT_DIR="../Plots/"
 DEFAULT_REPORT_NAME = "report.txt"
 
