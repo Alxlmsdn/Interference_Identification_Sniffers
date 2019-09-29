@@ -73,7 +73,7 @@ def main():
         if (ccbench.CONFIG != 'none'):
             ccbench.parseConfigFile(APP)
         #for i in range(int(ccbench.THREADS)):
-        app_args_list.append(ccbench.SIZE + " " + ccbench.ITERATIONS)
+        app_args_list.append(ccbench.SIZE + " " + ccbench.MIN_RUN_TIME)#ccbench.ITERATIONS)
         #print(app_args_list)
 
 

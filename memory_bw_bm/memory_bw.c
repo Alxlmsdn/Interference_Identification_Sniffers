@@ -28,7 +28,8 @@
 
 void memory_bw_bm(void *);
 
-static uint32_t iterations;
+//static uint32_t iterations;
+static double runTime;
 static uint32_t array_size;
 static long page_size;
 static double average_times[4] = {0};
@@ -42,7 +43,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     array_size = atoi(argv[1]);
-    iterations = atoi(argv[2]);
+    //iterations = atoi(argv[2]);
+    runTime = atof(argv[2]);
+
     if (pthread_mutex_init(&console_mutex, NULL) != 0) {
         fprintf(stdout, "mutex failed\n");
     }
@@ -84,8 +87,8 @@ void memory_bw_bm(void* tid) {
     cc_lfsr_init(&lfsr, 2, 7);
     int num_pages = array_size/page_size;
 
-    STREAM_ELEMENTS times[5][iterations];
-    double elapsed_times[5][iterations];
+    // STREAM_ELEMENTS times[5][iterations];
+    // double elapsed_times[5][iterations];
     STREAM_ELEMENTS *a, *b, *c;
     int *d;
     a = (STREAM_ELEMENTS *) malloc(sizeof(STREAM_ELEMENTS) * array_size);
@@ -100,38 +103,43 @@ void memory_bw_bm(void* tid) {
     }
     double elapsed_time = 0;
     double scalar = 3.0;
-    for (uint32_t n = 0; n < iterations; n++) {
-        times[0][n] = cc_get_seconds(0);
-        times[4][n] = times[0][n];
+    //for (uint32_t n = 0; n < iterations; n++) {
+    double curr_time; 
+    while (elapsed_time < runTime) {
+        //times[0][n] = cc_get_seconds(0);
+        //times[4][n] = times[0][n];
+        curr_time = cc_get_seconds(0);
         for (uint32_t i = 0; i < array_size; i++) {
             c[d[i]] = a[d[i]];
         }
-        times[0][n] = cc_get_seconds(0) - times[0][n];
+        //times[0][n] = cc_get_seconds(0) - times[0][n];
 
 
-        times[1][n] = cc_get_seconds(0);
+        //times[1][n] = cc_get_seconds(0);
         for (uint32_t i = 0; i < array_size; i++) {
             b[d[i]] = scalar*c[d[i]];
         }
-        times[1][n] = cc_get_seconds(0) - times[1][n];
+        //times[1][n] = cc_get_seconds(0) - times[1][n];
 
 
-        times[2][n] = cc_get_seconds(0);
+        //times[2][n] = cc_get_seconds(0);
         for (uint32_t i = 0; i < array_size; i++) {
             c[d[i]] = a[d[i]]+b[d[i]];
         }
-        times[2][n] = cc_get_seconds(0) - times[2][n];
+        //times[2][n] = cc_get_seconds(0) - times[2][n];
 
 
-        times[3][n] = cc_get_seconds(0);
+        //times[3][n] = cc_get_seconds(0);
         for (uint32_t i = 0; i < array_size; i++) {
             a[d[i]] = b[d[i]]+scalar*c[d[i]];
         }
-        times[4][n] = cc_get_seconds(0) - times[4][n];
-        times[3][n] = cc_get_seconds(0) - times[3][n];
-        elapsed_time += times[4][n];
+        //times[4][n] = cc_get_seconds(0) - times[4][n];
+        //times[3][n] = cc_get_seconds(0) - times[3][n];
+        curr_time = cc_get_seconds(0) - curr_time;
+        elapsed_time += curr_time;//times[4][n];
         pthread_mutex_lock(&console_mutex);
-        fprintf(stdout, "thread:[%d],rate:[%f](MB/s),totalTime:[%f](s)\n", id, 1e-6*(num_bytes[3]+num_bytes[2]+num_bytes[1]+num_bytes[0])/times[4][n], elapsed_time);
+        //fprintf(stdout, "thread:[%d],rate:[%f](MB/s),totalTime:[%f](s)\n", id, 1e-6*(num_bytes[3]+num_bytes[2]+num_bytes[1]+num_bytes[0])/times[4][n], elapsed_time);
+        fprintf(stdout, "thread:[%d],rate:[%f](MB/s),totalTime:[%f](s)\n", id, 1e-6*(num_bytes[3]+num_bytes[2]+num_bytes[1]+num_bytes[0])/curr_time, elapsed_time);
         pthread_mutex_unlock(&console_mutex);
     }
 
