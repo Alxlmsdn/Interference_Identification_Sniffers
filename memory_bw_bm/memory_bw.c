@@ -39,7 +39,7 @@ pthread_mutex_t console_mutex;
 int main(int argc, char* argv[]) {
 
     if (argc != 3) {
-        fprintf(stderr, "Usage: <array size> <number of iterations>\n");
+        fprintf(stderr, "Usage: <array size> <runTime>\n");
         return 1;
     }
     array_size = atoi(argv[1]);

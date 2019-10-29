@@ -74,7 +74,7 @@ def main():
             ccbench.parseConfigFile(APP)
             
         #for i in range(int(ccbench.THREADS)):
-        app_args_list.append(ccbench.MIN_RUN_TIME + " " + ccbench.SIZE + " " + ccbench.FILE_PATH))
+        app_args_list.append(ccbench.MIN_RUN_TIME + " " + ccbench.SIZE + " " + ccbench.FILE_PATH)
         #print(app_args_list)
 
     # 2. Execute the benchmark and write to the report file.

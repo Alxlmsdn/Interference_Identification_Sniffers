@@ -75,9 +75,9 @@ def main():
             ccbench.parseConfigFile(APP)
             
         if (ccbench.LEVEL1 != "0"):
-            app_args_list.append("L1 " + ccbench.LEVEL1 + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
+            app_args_list.append("L1 " + ccbench.LEVEL1 + " " + ccbench.ITERATIONS + "00 " + ccbench.MIN_RUN_TIME)
         if (ccbench.LEVEL2 != "0"):
-            app_args_list.append("L2 " + ccbench.LEVEL2 + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
+            app_args_list.append("L2 " + ccbench.LEVEL2 + " " + ccbench.ITERATIONS + "0 " + ccbench.MIN_RUN_TIME)
         if (ccbench.LEVEL3 != "0"):
             app_args_list.append("L3 " + ccbench.LEVEL3 + " " + ccbench.ITERATIONS + " " + ccbench.MIN_RUN_TIME)
         #print(app_args_list)
