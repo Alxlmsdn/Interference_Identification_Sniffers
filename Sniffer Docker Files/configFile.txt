@@ -1,0 +1,8 @@
+#config file for tests
+
+cpu --numThreads 3 -i 20001001 -t 10 --noplot
+disk_bw -t 10 -s 0  --noplot --file_path /data/
+memory_bw -s 10000000 -t 20 --noplot
+icache -s 100000 -t 10  --noplot
+caches -1 32768 -2 3145728 -i 3710886 -t 10 --noplot
+network_bw --ip 192.168.1.76 --port 55555 -s 1000000 -t 10 --noplot
