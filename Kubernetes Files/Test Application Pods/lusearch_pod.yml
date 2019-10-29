@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lusearch-pod
+  labels:
+    zone: prod
+    version: v1
+spec:
+  containers:
+  - name: dacapo-ctr
+    image: stef3a/dacapo:latest
+    #command: ["h2", "-s", "small", "-n", "1"]
+    args: ["lusearch", "-s", "large", "-n", "120"]
+    ports:
+    - containerPort: 5000
+  restartPolicy: Never

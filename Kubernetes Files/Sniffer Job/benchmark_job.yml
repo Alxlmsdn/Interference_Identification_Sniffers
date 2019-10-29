@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: benchmarks-job
+spec:
+  ttlSecondsAfterFinished: 20
+  template:
+    spec:
+      volumes:
+        - name: task-pv-storage
+          persistentVolumeClaim:
+            claimName: task-pv-claim
+      containers:
+      - name: benchmarks-ctr
+        image: alxlmsdn/honours:auto
+        volumeMounts:
+        - mountPath: /data
+          name: task-pv-storage
+      restartPolicy: Never
+  backoffLimit: 4
