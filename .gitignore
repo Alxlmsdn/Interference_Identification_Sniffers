@@ -1,0 +1,8 @@
+*.o
+*.pyc
+*.exe
+*.out
+*.app
+*.DS_Store
+*.vscode
+*.ipch
