@@ -66,20 +66,18 @@ def main():
     report_filename = REPORT_DIR + ccbench.getReportFileName(APP, REPORT_DIR)   
     report_csv_filename = REPORT_DIR + ccbench.getReportFileName(APP, REPORT_DIR, ".csv")
     # 1. Parse inputs.txt file.
-    if (not ccbench.NORUN):
-        # Build up the arguments list for each invocation of the benchmark.
-        # This is done here, instead of in ccbench.py, because this is custom to each app.
-        app_args_list = []
-        if (ccbench.CONFIG != 'none'):
-            ccbench.parseConfigFile(APP)
-        #for i in range(int(ccbench.THREADS)):
-        app_args_list.append(ccbench.SIZE + " " + ccbench.MIN_RUN_TIME)#ccbench.ITERATIONS)
-        #print(app_args_list)
+    # Build up the arguments list for each invocation of the benchmark.
+    # This is done here, instead of in ccbench.py, because this is custom to each app.
+    app_args_list = []
+    if (ccbench.CONFIG != 'none'):
+        ccbench.parseConfigFile(APP)
+
+    app_args_list.append(ccbench.SIZE + " " + ccbench.MIN_RUN_TIME)#ccbench.ITERATIONS)
+
 
 
     # 2. Execute the benchmark and write to the report file.
-    if (not ccbench.NORUN):
-        ccbench.runBenchmark(app_bin, app_args_list, report_filename)
+    ccbench.runBenchmark(app_bin, app_args_list, report_filename)
         
     # 3. Extract Data from the report file.
     data = ccbench.readReportFile(report_filename, variables)
