@@ -56,9 +56,11 @@ except:
 # 2. Runs benchmark (many times) and records results in results file.
 # 3. Parses results file for data (can also play back recording using NORUN option).
 # 4. Graphs results and outputs to .pdf file.
-def main():
+def main(args=None, report_dir=None):
+    if (report_dir != None):
+        REPORT_DIR = report_dir
     # handle CLI options
-    ccbench.controller()  
+    ccbench.controller(args)  
     #handle default/cli args app
     app_bin = BASE_DIR + APP
     #input_filename = BASE_DIR +  DEFAULT_INPUT_NAME
