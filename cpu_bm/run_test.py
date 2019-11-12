@@ -58,9 +58,12 @@ except:
 # 4. Graphs results and outputs to .pdf file.
 def main(args=None, report_dir=None):
     # handle CLI options
+    global REPORT_DIR
+    global PLOT_DIR
+    # handle CLI options
     if (report_dir != None):
         REPORT_DIR = report_dir
-    ccbench.controller(args)  
+        PLOT_DIR = report_dir  
     #handle default/cli args app
     app_bin = BASE_DIR + APP
     #input_filename = BASE_DIR +  DEFAULT_INPUT_NAME

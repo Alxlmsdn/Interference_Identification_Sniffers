@@ -17,5 +17,6 @@ RUN apt-get update && apt-get install -y \
 RUN pip3 install --trusted-host pypi.python.org -r requirements.txt
 
 # Run app.py when the container launches
-CMD ["./runall.sh"]
+#CMD ["./runall.sh"]
+ENTRYPOINT ["python3", "runall.py"]
 

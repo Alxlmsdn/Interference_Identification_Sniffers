@@ -57,9 +57,12 @@ except:
 # 3. Parses results file for data (can also play back recording using NORUN option).
 # 4. Graphs results and outputs to .pdf file.
 def main(args=None, report_dir=None):
+    global REPORT_DIR
+    global PLOT_DIR
+    # handle CLI options
     if (report_dir != None):
         REPORT_DIR = report_dir
-    # handle CLI options
+        PLOT_DIR = report_dir
     ccbench.controller(args)  
     #handle default/cli args app
     app_bin = BASE_DIR + APP
