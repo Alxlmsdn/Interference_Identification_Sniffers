@@ -12,7 +12,9 @@ spec:
             claimName: task-pv-claim
       containers:
       - name: benchmarks-ctr
-        image: alxlmsdn/honours:auto
+        image: alxlmsdn/honours:sniffers
+        #arguments to the docker image 
+        args: ["/data/config/configFile.txt", "/data/Reports/", "--sniffers", "cpu_bm"]
         volumeMounts:
         - mountPath: /data
           name: task-pv-storage
