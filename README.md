@@ -27,7 +27,14 @@ The high-level approach used in the research (Refer to the Honours Dissertation 
 Each sniffer is an individual micro-benchmark that contains a C source code file that represents the micro-benchmark and a Python file that is used handle/plot data from the sniffer C code or run the C source code automatically. 
 
 For details on how to run an individual sniffer, refer to the README within each individual sniffer. 
-To run all the sniffers, edit **configFile.txt** with the parameters to match the system specifications. Then execute the **runall** script and the sniffer data will be saved in folders named *Reports* and/or *Plots*. 
+To run all the sniffers, edit **configFile.txt** with the parameters to match the system specifications, then execute the **runall.py** script.
+> python3 runall.py 'absoulte-path-to-config-file' 'absolute-path-to-results-folder' --sniffers 'sniffers-to-execute' ...
+
+Using the **runall.py** script, the first required argument is the file path to the configfile that holds all the arguments for each sniffer. The second is the folder path where the results from each sniffer will be saved. If only these arguments are given, all sniffers will be executed. To only execute specific sniffers, use the **--sniffers** option and follow it with the specified sniffers (space seperated). Use **runall.py --help** to see the names for each sniffer.
+An example of using **runall.py**:
+> python3 runall.py /home/documents/configFile.txt /home/documents/results/ --sniffers cpu_bm disk_bw_bm
+
+This will use the sniffer arguments in the configFile.txt file, then store the results in the .../results/ folder, and only execute the CPU & Disk sniffers.   
   
 ### Cache latency:
 > cache_latency_bm 
@@ -70,7 +77,7 @@ folder, a modified copy of each sniffer and an included dockerfile can be used t
 
 There is a public Docker image that represents the sniffer application and it can be downloaded/pulled from https://cloud.docker.com/repository/docker/alxlmsdn/honours/general
 
-**Note:** *Currently the docker image is set to create the containerized sniffer application that uses a local configFile.txt that is accessed using a Kubernetes Volume, this volume is also where the results get stored. This plans to be changed so that the container can be passed runtime arguments and a user can specify the configFile.txt passed to the container. 
+**Note:** This docker images entrypoint is the **runall.py** script, the image takes the command line arguments to the script as argumnets to the image, this enables sniffer parameters and results to be dynamically changed without re-creating the image.
 
 ## Kubernetes
 >Kubernetes Files
